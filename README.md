@@ -4,7 +4,7 @@ Services engineering project
 # Installing requirements
 
 ```sh
-python -m pip install DEV/.devcontainer/requirements.txt
+python -m pip install requirements.txt
 ```
 
 # ARCH

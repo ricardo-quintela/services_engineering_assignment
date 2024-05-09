@@ -1,19 +1,47 @@
-from django.contrib.auth.models import User, Group
+# pylint: disable=no-member
+"""Contains the API endpoints used for authentication and related
+"""
+from django.contrib.auth.models import User
+from django.http import HttpRequest
 
-from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import UserSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
-    """To see the created users
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = []
 
-class GroupViewSet(viewsets.ModelViewSet):
+@api_view(["GET"])
+def users_view(_: HttpRequest, user_id: int) -> Response:
+    """Returns the user with the given id
+
+    If the user doesn't exist an error message will be returned instead
+
+    Args:
+        _ (HttpRequest): the request data
+        user_id (int): the id of the user
+
+    Returns:
+        Response: the serialized user data
     """
-    API endpoint that allows groups to be viewed or edited.
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "User does not exist."})
+
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data)
+
+@api_view(["GET"])
+def all_users_view(_: HttpRequest) -> Response:
+    """Returns a serialized list of all users
+
+    Args:
+        _ (HttpRequest): the request data
+
+    Returns:
+        Response: the serialized users data
     """
-    queryset = Group.objects.all().order_by('name')
-    serializer_class = GroupSerializer
-    permission_classes = []
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+
+    return Response(serializer.data)

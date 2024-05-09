@@ -1,10 +1,12 @@
+from django.shortcuts import render, redirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
+
 from rest_framework import permissions, viewsets
 from .serializers import UserSerializer, GroupSerializer
-from django.shortcuts import render
-from django.contrib.auth import authenticate
 
-from .forms import LoginForm
+from .forms import AuthForm
 
 class UserViewSet(viewsets.ModelViewSet):
     """To see the created users
@@ -21,10 +23,18 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-def login(request):
+def login_view(request: HttpRequest) -> HttpResponse:
+    """Logs a user in
+
+    Args:
+        request (HttpRequest): the request
+
+    Returns:
+        HttpResponse: the rendered login template
+    """
 
     if request.method == "POST":
-        login_form = LoginForm(request.POST)
+        login_form = AuthForm(data=request.POST)
 
         if login_form.is_valid():
             username = login_form.cleaned_data["username"]
@@ -33,10 +43,10 @@ def login(request):
             user = authenticate(username=username, password=password)
 
             if user is not None:
-                login(user)
+                login(request=request, user=user)
 
     else:
-        login_form = LoginForm()
+        login_form = AuthForm()
 
 
     context = {
@@ -44,3 +54,16 @@ def login(request):
     }
 
     return render(request, "login.html", context=context)
+
+
+def logout_view(request: HttpRequest) -> HttpResponseRedirect:
+    """Logs a user out and redirects to the home page
+
+    Args:
+        request (HttpRequest): the request
+
+    Returns:
+        HttpResponseRedirect: a redirect to the landing page
+    """
+    logout(request)
+    return redirect("/")

@@ -1,6 +1,12 @@
 # services_engineering_assignment
 Services engineering project
 
+# Installing requirements
+
+```sh
+python -m pip install DEV/.devcontainer/requirements.txt
+```
+
 # ARCH
 
 ![arch](image.png)

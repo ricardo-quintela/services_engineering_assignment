@@ -24,9 +24,20 @@ class GroupViewSet(viewsets.ModelViewSet):
 def login(request):
 
     if request.method == "POST":
-        login_form = LoginForm(request)
+        login_form = LoginForm(request.POST)
+
+        if login_form.is_valid():
+            username = login_form.cleaned_data["username"]
+            password = login_form.cleaned_data["password"]
+
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                login(user)
+
     else:
         login_form = LoginForm()
+
 
     context = {
         "login_form": login_form

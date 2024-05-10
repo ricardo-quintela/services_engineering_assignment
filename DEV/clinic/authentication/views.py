@@ -61,10 +61,13 @@ def login_view(request: HttpRequest) -> JsonResponse:
     username = request.POST.get("username")
     password = request.POST.get("password")
 
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "Invalid username."})
 
-    user = User.objects.get(username=username)
     if not user.check_password(password):
-        return JsonResponse({"error": "Invalid credentials."})
+        return JsonResponse({"error": "Invalid password."})
 
     response = JsonResponse(
         {

@@ -71,7 +71,7 @@ class TestUserEndPoints(BaseTestCase):
         """Tests if a random user in the database can be returned
         """
         self.client.cookies.load({"jwt": INVALID_TOKEN})
-        response = self.client.get(f"/users/")
+        response = self.client.get("/users/")
         self.assertJSONEqual(
             response.content,
             {
@@ -118,6 +118,40 @@ class TestUserEndPoints(BaseTestCase):
         self.assertRegex(
             response.cookies["jwt"].value,
             r"(^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$)"
+        )
+
+    def test_login_invalid_username(self):
+        """Tests if a user cannot login with an invalid username
+        """
+        response = self.client.post(
+            "/login/",
+            data={
+                "username": "unexistent_username",
+                "password": "password"
+            }
+        )
+        self.assertJSONEqual(
+            response.content,
+            {
+                "error": "Invalid username."
+            }
+        )
+
+    def test_login_invalid_password(self):
+        """Tests if a user cannot login with an invalid password
+        """
+        response = self.client.post(
+            "/login/",
+            data={
+                "username": "test_user1",
+                "password": "unexistent_password"
+            }
+        )
+        self.assertJSONEqual(
+            response.content,
+            {
+                "error": "Invalid password."
+            }
         )
 
 

@@ -127,3 +127,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # JWT Auth
 JWT_ALGORITHM = "HS256"
+JWT_TOKEN_EXPIRY = 60*5

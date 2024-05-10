@@ -1,6 +1,21 @@
-from django.contrib.auth.models import User
-from clinic.settings import SECRET_KEY, JWT_ALGORITHM
+from typing import Callable, Any
+from datetime import datetime
+
 import jwt
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpRequest, JsonResponse
+from pydantic import BaseModel, ValidationError
+
+from clinic.settings import SECRET_KEY, JWT_ALGORITHM, JWT_TOKEN_EXPIRY
+
+
+class JwtPayload(BaseModel):
+    """A valid structure of a JWT"""
+
+    username: str
+    password: str
+    timestamp: float
+
 
 def generate_token(user: User) -> str:
     """Generates a JWT based on the user's credentials
@@ -11,14 +26,16 @@ def generate_token(user: User) -> str:
     Returns:
         str: the JWT
     """
-    payload = {
-        "username": user.username,
-        "password": user.password
-    }
+    jwt_payload = JwtPayload(
+        username=user.username,
+        password=user.password,
+        timestamp=datetime.now().timestamp(),
+    )
 
-    return jwt.encode(payload, SECRET_KEY, JWT_ALGORITHM)
+    return jwt.encode(jwt_payload.dict(), SECRET_KEY, JWT_ALGORITHM)
 
-def validate_token(token: str) -> dict | None:
+
+def validate_token(token: str) -> dict[str, str | float] | None:
     """Validates a given token
 
     Args:
@@ -29,7 +46,78 @@ def validate_token(token: str) -> dict | None:
     """
     try:
         decoded_payload = jwt.decode(token, SECRET_KEY, JWT_ALGORITHM)
+
     except jwt.InvalidSignatureError:
         return None
 
     return decoded_payload
+
+
+def verify_expiry(jwt_payload: JwtPayload) -> bool:
+    """Verifies the expiry of the given token
+
+    Args:
+        payload (JwtPayload): the payload of a JWT
+
+    Returns:
+        bool: True if it hasn't expired, False otherwise
+    """
+    timestamp = jwt_payload.timestamp
+    date_time_instance = datetime.fromtimestamp(timestamp)
+
+    return (datetime.now() - date_time_instance).total_seconds() < JWT_TOKEN_EXPIRY
+
+
+def verify_format(jwt_payload: dict[str, str | float]) -> JwtPayload | None:
+    """Verifies the format of a JWT payload
+
+    Args:
+        payload (dict[str, str  |  float]): the payload of the JWT
+
+    Returns:
+        JwtPayload | None: A JwtPayload instance with the payload contents if it can
+        be validated, None otherwise
+    """
+    try:
+        jwt_payload = JwtPayload(**jwt_payload)
+
+    except ValidationError:
+        return None
+
+    return jwt_payload
+
+
+def requires_jwt(
+    endpoint: Callable[[HttpRequest, Any], HttpResponse]
+) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
+    """Makes an endpoint require a valid JWT sent in the cookies
+
+    Args:
+        endpoint (Callable[[HttpRequest, Any], HttpResponse]): the endpoint
+
+    Returns:
+        Callable[[HttpRequest, Any], JsonResponse | HttpResponse]: the same endpoint
+        with JWT authentication
+    """
+    error_message = {"error": "User is not logged in."}
+
+    def wrapper(*args, **kwargs):
+        try:
+            token = args[0].COOKIES["jwt"]
+        except KeyError:
+            return JsonResponse(error_message)
+
+        payload = validate_token(token)
+        if payload is None:
+            return JsonResponse(error_message)
+
+        jwt_payload = verify_format(payload)
+        if jwt_payload is None:
+            return JsonResponse(error_message)
+
+        if not verify_expiry(jwt_payload):
+            return JsonResponse(error_message)
+
+        return endpoint(*args, **kwargs)
+
+    return wrapper

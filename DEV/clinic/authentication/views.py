@@ -6,8 +6,9 @@ from django.http import HttpRequest, JsonResponse
 
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
+from .jwt import generate_token, requires_jwt
 
-
+@requires_jwt
 @api_view(["GET"])
 def users_view(_: HttpRequest, user_id: int) -> JsonResponse:
     """Returns the user with the given id
@@ -30,6 +31,7 @@ def users_view(_: HttpRequest, user_id: int) -> JsonResponse:
 
     return JsonResponse(serializer.data, safe=False)
 
+@requires_jwt
 @api_view(["GET"])
 def all_users_view(_: HttpRequest) -> JsonResponse:
     """Returns a serialized list of all users
@@ -44,3 +46,31 @@ def all_users_view(_: HttpRequest) -> JsonResponse:
     serializer = UserSerializer(users, many=True)
 
     return JsonResponse(serializer.data, safe=False)
+
+@api_view(["POST"])
+def login_view(request: HttpRequest) -> JsonResponse:
+    """Logs a user in and returns a valid JWT the response's cookies
+
+    Args:
+        request (HttpRequest): the request data
+
+    Returns:
+        JsonResponse: a message with login details with a JWT embeded in the cookies
+    """
+
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+
+
+    user = User.objects.get(username=username)
+    if not user.check_password(password):
+        return JsonResponse({"error": "Invalid credentials."})
+
+    response = JsonResponse(
+        {
+            "message": "Successfully logged in."
+        }
+    )
+    response.set_cookie("jwt", generate_token(user))
+
+    return response

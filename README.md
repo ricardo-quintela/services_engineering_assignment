@@ -1,23 +1,64 @@
 # services_engineering_assignment
-Services engineering project
+<p align='center'>
+    <img src="https://img.shields.io/badge/Python-gray?logo=python&logoColor=yellow" />
+    <img src="https://img.shields.io/badge/Django-gray?logo=django" />
+    <img src="https://img.shields.io/badge/React-gray?logo=react" />
+    <img src="https://img.shields.io/badge/Typescript-gray?logo=typescript&logoColor=white" />
+</p>
 
-# Installing requirements
+# Requirements
 
+## Backend
 ```sh
 python -m pip install requirements.txt
 ```
 
-# ARCH
+## Frontend
+```sh
+cd DEV/clinic_frontend
+npm install
+```
 
-![arch](image.png)
+# Running
+## Backend
+```sh
+cd DEV/clinic
+python manage.py runserver
+```
+
+## Frontend
+```sh
+cd DEV/clinic_frontend
+npm start
+```
+
+# Testing
+## Backend
+```sh
+cd DEV/clinic
+python manage.py test
+```
+
+## Frontend
+```sh
+¯\_(ツ)_/¯
+```
+
+# Architecture
+The backend architecture in the cloud is as follows:
+
+![arch](ARCH/arch.png)
 
 ## Elastic Beanstalk
 
-Runs django and the authentication system.
+Runs the django rest-framework API with the authentication system.
 
 ## Workflow
 
 When a button is clicked, django lauches a workflow that runs a lambda function.
+
+## S3 Buckets
+Stores static files such as images for the rekognition software.
 
 ## Database
 

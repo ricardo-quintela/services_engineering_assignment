@@ -58,8 +58,8 @@ def login_view(request: HttpRequest) -> JsonResponse:
         JsonResponse: a message with login details with a JWT embeded in the cookies
     """
 
-    username = request.POST.get("username")
-    password = request.POST.get("password")
+    username = request.data.get("username")
+    password = request.data.get("password")
 
     try:
         user = User.objects.get(username=username)

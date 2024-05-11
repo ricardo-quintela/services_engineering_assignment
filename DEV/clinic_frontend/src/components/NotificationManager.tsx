@@ -1,5 +1,4 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
 import ToastNotification from "./ToastNotification";
 
 export interface NotificationData {

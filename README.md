@@ -44,22 +44,62 @@ python manage.py test
 ¯\_(ツ)_/¯
 ```
 
+# Description of the service
+
+## Website
+- Login
+- Schedule Appointments
+
+## Scheduling Appointments
+1. Login
+2. Select type of specialty
+3. Specify doctor's name (optional)
+4. Payment
+
+### Specialties:
+- Massage
+- Evaluation appointment
+- Musculoskeletal physiotherapy
+- Therapeutic massage
+- Shock waves
+
+## Payment
+1. Receive SMS with payment link
+2. Select payment method
+3. Provide invoice details
+4. Pay
+5. Receive invoice in email
+
+### Payment Methods
+#### Multibanco
+- Generates reference numbers
+#### MB Way
+- Requires valid phone number
+
+## Appointment Day (on the clinic)
+1. User arrives
+2. Facial recognition to identify user
+3. User's name is displayed on the waiting room screen as well as estimated waiting time and room number
+
+## Login & Authentication
+### Login
+
+1. User inserts username & password
+2. Server verifies user's credentials
+3. Server generates JWT
+4. Server sends JWT with cookies of the login response
+
+### Authentication
+The requests to the API must include a JWT in the cookies
+
+
 # Architecture
 The backend architecture in the cloud is as follows:
 
 ![arch](ARCH/arch.png)
 
 ## Elastic Beanstalk
+This service runs the Django Rest Framework API
 
-Runs the django rest-framework API with the authentication system.
-
-## Workflow
-
-When a button is clicked, django lauches a workflow that runs a lambda function.
-
-## S3 Buckets
-Stores static files such as images for the rekognition software.
-
-## Database
-
-Cannot be sqlite3 (default to django). Instead SimpleDB or DynamoDB should be used. More that one should be used to separate the storage of user data and other things.
+## S3
+This service stores static files like images from the database used for the Rekognition service and the react application itself.

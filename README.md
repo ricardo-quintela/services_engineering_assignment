@@ -6,6 +6,18 @@
     <img src="https://img.shields.io/badge/Typescript-gray?logo=typescript&logoColor=white" />
 </p>
 
+# Repository Structure
+
+```
+.
+├── ARCH
+├── DEV
+│   └── clinic
+│   └── clinic_frontend
+└── PM
+```
+
+
 # Requirements
 
 ## Backend

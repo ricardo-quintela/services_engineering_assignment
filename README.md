@@ -10,7 +10,7 @@
 
 ## Backend
 ```sh
-python -m pip install requirements.txt
+python -m pip install clinic/requirements.txt
 ```
 
 ## Frontend
@@ -103,3 +103,42 @@ This service runs the Django Rest Framework API
 
 ## S3
 This service stores static files like images from the database used for the Rekognition service and the react application itself.
+
+
+# Running a containerized version (Docker)
+## Install Docker
+```sh
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+## Building the system
+```sh
+docker-compose up --build -d
+```
+
+This command should be used to refresh changes made in the source code files.
+
+# Deploying frontend app to S3
+```sh
+cd clinic_frontend
+npm run build
+cd ..
+python deploy_frontend.py [-e s3_endpoint_url]
+```
+
+`-e` flag should be used for the docker container (`http://localhost:9090`).
+
+If the target S3 bucket lives on the AWS cloud then not providing the `-e` should suffice.

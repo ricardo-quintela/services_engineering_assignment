@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  backend_api:
+    build:
+      dockerfile: Dockerfile
+      context: clinic/
+    ports:
+      - "8000:8000"
+
+  frontend_s3:
+    image: "adobe/s3mock:latest"
+    environment:
+      - initialBuckets=frontend
+    ports:
+      - "9090:9090"

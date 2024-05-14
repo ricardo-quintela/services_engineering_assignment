@@ -37,9 +37,14 @@ def main():
     defined in the .aws/ directory is used.
     """
     )
+    parser.add_argument("-b", "--bucket-name", required=True, help="""
+    specify the S3 bucket name.
+    """
+    )
     args = parser.parse_args()
 
     endpoint_url = args.endpoint_url
+    bucket_name = args.bucket_name
 
     s3 = boto3.client("s3", endpoint_url=endpoint_url)
     for root, _, files in os.walk(os.path.join("clinic_frontend", "build")):
@@ -48,7 +53,7 @@ def main():
             print(f"Uploading: {os.path.join(root, file)}")
             s3.upload_file(
                 file_path,
-                "frontend",
+                bucket_name,
                 file_path.removeprefix(os.path.join("clinic_frontend", "build") + "/"),
                 ExtraArgs={"ContentType": get_content_type(file)},
             )

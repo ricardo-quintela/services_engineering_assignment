@@ -1,25 +1,11 @@
-from django.contrib.auth.models import User
-from django.test import TestCase
+from datetime import datetime
 from random import randint
 
-from rest_framework.test import APIClient
+from clinic.tests import BaseTestCase
+
 from .jwt import generate_token, validate_token, verify_expiry, verify_format, JwtPayload
-from datetime import datetime
 
-NUM_USERS = 10
-
-INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyM30.xktKTj9uy3wFoD4OL58u2V39DIi9d92RSG7jWopyfw0"
-
-class BaseTestCase(TestCase):
-    """Sets Up the database and test client for the tests
-    """
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.users = list()
-
-        for i in range(1, NUM_USERS+1):
-            user = User.objects.create_user(username=f"test_user{i}", password=f"test_password{i}")
-            self.users.append(user)
+INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyMywicm9sZSI6bnVsbH0.Ibl8w_Ys0FUfWWpw0YuTcYfB-u-2QhSZKZe3aRnhxao"
 
 
 # Create your tests here.
@@ -30,7 +16,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user(self):
         """Tests if a random user in the database can be returned
         """
-        user_id = randint(1, NUM_USERS)
+        user_id = randint(1, len(self.users))
         self.client.cookies.load({"jwt": generate_token(self.users[0])})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
@@ -44,7 +30,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user_not_authenticated(self):
         """Tests if a random user in the database can be returned
         """
-        user_id = randint(1, NUM_USERS)
+        user_id = randint(1, len(self.users))
         self.client.cookies.load({"jwt": INVALID_TOKEN})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
@@ -63,7 +49,7 @@ class TestUserEndPoints(BaseTestCase):
             response.content,
             [
                 {"id": i, "username": f"test_user{i}"}
-                for i in range(1, NUM_USERS+1)
+                for i in range(1, len(self.users)+1)
             ]
         )
 
@@ -83,7 +69,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_invalid_user(self):
         """Tests if getting an invalid user will return an error message
         """
-        user_id = NUM_USERS+1
+        user_id = len(self.users)+1
         self.client.cookies.load({"jwt": generate_token(self.users[0])})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
@@ -94,7 +80,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_invalid_user_not_authenticated(self):
         """Tests if getting an invalid user will return an error message
         """
-        user_id = NUM_USERS+1
+        user_id = len(self.users)+1
         self.client.cookies.load({"jwt": INVALID_TOKEN})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
@@ -157,6 +143,8 @@ class TestUserEndPoints(BaseTestCase):
 
 
 class TestJWT(BaseTestCase):
+    """Tests token generation and validation
+    """
 
     def test_create_jwt(self):
         """Test if a valid JWT can be generated with user data
@@ -171,24 +159,23 @@ class TestJWT(BaseTestCase):
     def test_verify_token(self):
         """Tests if a token can be validated
         """
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyM30.xktKTj9uy3wFoD4OL58u2V39DIi9d92RSG7jWopyfw0"
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyMywicm9sZSI6bnVsbH0.uG7W2DQb2i-GnTf2PuSosa9jS32r6q5jXECE6qBJeGA"
 
         self.assertDictEqual(
             validate_token(token),
             {
                 "username": "test_user1",
                 "password": "test_password1",
-                "timestamp": 1715340540.001223
+                "timestamp": 1715340540.001223,
+                "role": None
             }
         )
 
     def test_verify_invalid_token(self):
         """Tests if an invalid token returns None
         """
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyM30.J5FvcrY52ySpWvKLHAwCI70mSuZVkaoeKaEWZoEH360"
-
         self.assertIsNone(
-            validate_token(token)
+            validate_token(INVALID_TOKEN)
         )
 
     def test_valid_token_expiry(self):
@@ -199,7 +186,8 @@ class TestJWT(BaseTestCase):
                 JwtPayload(
                     username="test_user1",
                     password="test_password1",
-                    timestamp=datetime.now().timestamp()
+                    timestamp=datetime.now().timestamp(),
+                    role=None
                 )
             )
         )
@@ -212,7 +200,8 @@ class TestJWT(BaseTestCase):
                 JwtPayload(
                     username="test_user1",
                     password="test_password1",
-                    timestamp=datetime(1999,1,1).timestamp()
+                    timestamp=datetime(1999,1,1).timestamp(),
+                    role=None
                 )
             )
         )
@@ -225,13 +214,15 @@ class TestJWT(BaseTestCase):
                 {
                     "username": "test_user1",
                     "password": "test_password1",
-                    "timestamp": datetime(1999,1,1).timestamp()
+                    "timestamp": datetime(1999,1,1).timestamp(),
+                    "role": None
                 }
             ),
             JwtPayload(
                 username="test_user1",
                 password="test_password1",
-                timestamp=datetime(1999,1,1).timestamp()
+                timestamp=datetime(1999,1,1).timestamp(),
+                role=None
             )
         )
 

@@ -138,7 +138,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 ## Building the system
 ```sh
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 This command should be used to refresh changes made in the source code files.

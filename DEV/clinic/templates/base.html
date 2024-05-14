@@ -1,14 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-    {% block content %}
-    {% endblock %}
-
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>React App</title>
+		<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+		<script defer="defer" src="{% static 'js/main.a2ee5bfe.js' %}"></script>
+		<link href="{% static 'css/main.4dbcc2a3.css' %}" rel="stylesheet" />
+	</head>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<main id="root"></main>
+	</body>
 </html>

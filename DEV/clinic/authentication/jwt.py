@@ -15,6 +15,7 @@ class JwtPayload(BaseModel):
     username: str
     password: str
     timestamp: float
+    role: str | None
 
 
 def generate_token(user: User) -> str:
@@ -26,10 +27,14 @@ def generate_token(user: User) -> str:
     Returns:
         str: the JWT
     """
+
+    role = user.groups.first()
+
     jwt_payload = JwtPayload(
         username=user.username,
         password=user.password,
         timestamp=datetime.now().timestamp(),
+        role=role.name if role is not None else None
     )
 
     return jwt.encode(jwt_payload.dict(), SECRET_KEY, JWT_ALGORITHM)

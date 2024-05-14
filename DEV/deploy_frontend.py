@@ -2,6 +2,10 @@ import os
 import boto3
 import argparse
 
+import boto3.s3
+import boto3.s3.constants
+import boto3.session
+
 
 def get_content_type(file_path: str):
     extension = os.path.splitext(file_path)[-1]
@@ -47,6 +51,7 @@ def main():
     bucket_name = args.bucket_name
 
     s3 = boto3.client("s3", endpoint_url=endpoint_url)
+
     for root, _, files in os.walk(os.path.join("clinic_frontend", "build")):
         for file in files:
             file_path = os.path.join(root, file)

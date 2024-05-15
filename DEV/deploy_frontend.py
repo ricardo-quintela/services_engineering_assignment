@@ -45,14 +45,22 @@ def main():
     specify the S3 bucket name.
     """
     )
+    parser.add_argument("-d", "--build-directory", required=True, help="""
+    specify the build directory.
+    """
+    )
     args = parser.parse_args()
 
     endpoint_url = args.endpoint_url
     bucket_name = args.bucket_name
+    build_directory = args.build_directory
+
+    if not os.path.isdir(build_directory):
+        print(f"{build_directory} is not a directory.")
 
     s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-    for root, _, files in os.walk(os.path.join("clinic_frontend", "build")):
+    for root, _, files in os.walk(build_directory):
         for file in files:
             file_path = os.path.join(root, file)
             print(f"Uploading: {os.path.join(root, file)}")

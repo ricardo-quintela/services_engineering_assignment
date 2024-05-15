@@ -21,7 +21,6 @@ const App = () => {
 	const completeLogin = () => {
 
 		const jwt_payload: JwtPayload = jwtDecode(cookies.jwt);
-		console.table(jwt_payload);
 
 		if (jwt_payload.role === "admin") {
 			setChildren([

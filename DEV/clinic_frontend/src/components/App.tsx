@@ -1,8 +1,13 @@
 import { ReactElement, useState } from "react";
-import LoginForm, { LoginReponseData } from "./LoginForm";
+import LoginForm from "./LoginForm";
 import NavBar from "./NavBar";
-import NotificationManager, { NotificationData } from "./NotificationManager";
 import AdminDashboard from "./AdminDashboard";
+import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
+import { NotificationData } from "../interfaces/notification";
+import NotificationManager from "./NotificationManager";
+import { JwtPayload } from "../interfaces/jwt";
+
 
 const App = () => {
 	const addNotification = (notificationData: NotificationData) =>
@@ -10,12 +15,22 @@ const App = () => {
 
 	const closeNotification = (index: number) =>
 		setNotificationQueue(notificationQueue.filter((_, i) => i !== index));
-	
-	const completeLogin = (loginResponseData: LoginReponseData) => {
 
-        setChildren([
-            <AdminDashboard addNotification={addNotification} />
-        ]);
+	const [cookies, setCookies] = useCookies(["jwt"]);
+	
+	const completeLogin = () => {
+
+		const jwt_payload: JwtPayload = jwtDecode(cookies.jwt);
+		console.table(jwt_payload);
+
+		if (jwt_payload.role === "admin") {
+			setChildren([
+				<AdminDashboard key={0} addNotification={addNotification} />
+			]);
+		} else {
+			setChildren([]);
+		}
+
     };
 
 	const [notificationQueue, setNotificationQueue] = useState([] as NotificationData[]

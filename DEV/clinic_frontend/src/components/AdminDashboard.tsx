@@ -1,9 +1,9 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FormEvent } from "react";
-import { NotificationData } from "./NotificationManager";
 import { Button } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
+import { NotificationData } from "../interfaces/notification";
 
 axios.defaults.withCredentials = true;
 

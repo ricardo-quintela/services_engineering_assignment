@@ -1,11 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "./ToastNotification";
-
-export interface NotificationData {
-    title: string;
-    time?: string;
-    message: string;
-}
+import { NotificationData } from "../interfaces/notification";
 
 const NotificationManager = ({
     notificationQueue,

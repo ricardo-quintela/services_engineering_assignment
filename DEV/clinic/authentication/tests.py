@@ -5,7 +5,7 @@ from clinic.tests import BaseTestCase
 
 from .jwt import generate_token, validate_token, verify_expiry, verify_format, JwtPayload
 
-INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyMywicm9sZSI6bnVsbH0.Ibl8w_Ys0FUfWWpw0YuTcYfB-u-2QhSZKZe3aRnhxao"
+INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJ0aW1lc3RhbXAiOjE3MTUzNDA1NDAuMDAxMjIzLCJyb2xlIjpudWxsfQ.qrmwgNoyxCMRJ5QcmcWuH3DwyjMcqsPYMu438l2BvI0"
 
 
 # Create your tests here.
@@ -159,13 +159,12 @@ class TestJWT(BaseTestCase):
     def test_verify_token(self):
         """Tests if a token can be validated
         """
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJwYXNzd29yZCI6InRlc3RfcGFzc3dvcmQxIiwidGltZXN0YW1wIjoxNzE1MzQwNTQwLjAwMTIyMywicm9sZSI6bnVsbH0.uG7W2DQb2i-GnTf2PuSosa9jS32r6q5jXECE6qBJeGA"
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJ0aW1lc3RhbXAiOjE3MTUzNDA1NDAuMDAxMjIzLCJyb2xlIjpudWxsfQ.it9lIbICZMTXOfvvZxNw6XiYTcTFjhpL9IQ6j1zNEe4"
 
         self.assertDictEqual(
             validate_token(token),
             {
                 "username": "test_user1",
-                "password": "test_password1",
                 "timestamp": 1715340540.001223,
                 "role": None
             }
@@ -185,7 +184,6 @@ class TestJWT(BaseTestCase):
             verify_expiry(
                 JwtPayload(
                     username="test_user1",
-                    password="test_password1",
                     timestamp=datetime.now().timestamp(),
                     role=None
                 )
@@ -199,7 +197,6 @@ class TestJWT(BaseTestCase):
             verify_expiry(
                 JwtPayload(
                     username="test_user1",
-                    password="test_password1",
                     timestamp=datetime(1999,1,1).timestamp(),
                     role=None
                 )
@@ -213,14 +210,12 @@ class TestJWT(BaseTestCase):
             verify_format(
                 {
                     "username": "test_user1",
-                    "password": "test_password1",
                     "timestamp": datetime(1999,1,1).timestamp(),
                     "role": None
                 }
             ),
             JwtPayload(
                 username="test_user1",
-                password="test_password1",
                 timestamp=datetime(1999,1,1).timestamp(),
                 role=None
             )
@@ -233,7 +228,6 @@ class TestJWT(BaseTestCase):
             verify_format(
                 {
                     "username": "test_user1",
-                    "password": "test_password1",
                 }
             )
         )

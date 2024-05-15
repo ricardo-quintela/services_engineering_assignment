@@ -26,14 +26,16 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+EBS_URL = os.environ.get("EBS_URL", "localhost")
+EBS_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000")
+EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend")
+
 ALLOWED_HOSTS = [
-    os.environ["EBS_URL"]
+    EBS_URL
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    os.environ["S3_BUCKET_URL"]
+    EBS_BUCKET_URL
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -50,7 +52,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "clinic",
-    "admin",
 ]
 
 MIDDLEWARE = [
@@ -131,7 +132,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = ["static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

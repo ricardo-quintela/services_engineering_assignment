@@ -1,61 +1,63 @@
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import LoginForm from "./LoginForm";
 import NavBar from "./NavBar";
 import AdminDashboard from "./AdminDashboard";
-import { jwtDecode } from "jwt-decode";
-import { useCookies } from "react-cookie";
 import { NotificationData } from "../interfaces/notification";
 import NotificationManager from "./NotificationManager";
-import { JwtPayload } from "../interfaces/jwt";
-
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import SchedullingForm from "./SchedullingForm";
 
 const App = () => {
-	const addNotification = (notificationData: NotificationData) =>
-		setNotificationQueue([...notificationQueue, notificationData]);
+    const addNotification = (notificationData: NotificationData) =>
+        setNotificationQueue([...notificationQueue, notificationData]);
 
-	const closeNotification = (index: number) =>
-		setNotificationQueue(notificationQueue.filter((_, i) => i !== index));
+    const closeNotification = (index: number) =>
+        setNotificationQueue(notificationQueue.filter((_, i) => i !== index));
 
-	const [cookies, setCookies] = useCookies(["jwt"]);
-	
-	const completeLogin = () => {
+    const [notificationQueue, setNotificationQueue] = useState(
+        [] as NotificationData[]
+    );
 
-		const jwt_payload: JwtPayload = jwtDecode(cookies.jwt);
+    return (
+        <>
+            {/* inner content of the page */}
+            <BrowserRouter>
+                {/* nav bar */}
+                <NavBar />
 
-		if (jwt_payload.role === "admin") {
-			setChildren([
-				<AdminDashboard key={0} addNotification={addNotification} />
-			]);
-		} else {
-			setChildren([]);
-		}
+                <section className="h-75">
+					<Routes>
+						<Route path="/" element={<h1>Página Inicial</h1>} />
+						<Route path="/scheduling" element={<SchedullingForm />} />
+						<Route
+							path="/login"
+							element={
+								<LoginForm
+									key={0}
+									addNotification={addNotification}
+								/>
+							}
+						/>
+						<Route
+							path="/admin"
+							element={
+								<AdminDashboard
+									key={0}
+									addNotification={addNotification}
+								/>
+							}
+						/>
+					</Routes>
+				</section>
 
-    };
-
-	const [notificationQueue, setNotificationQueue] = useState([] as NotificationData[]
-	);
-	const [children, setChildren] = useState([
-		<LoginForm
-			key={0}
-			addNotification={addNotification}
-			completeLogin={completeLogin}
-		/>
-	] as ReactElement[]);
-
-	
-
-	return (
-		<>
-			<NavBar />
-
-			{ children }
-
-			<NotificationManager
-				notificationQueue={notificationQueue}
-				closeNotification={closeNotification}
-			/>
-		</>
-	);
+                {/* handle notifications */}
+                <NotificationManager
+                    notificationQueue={notificationQueue}
+                    closeNotification={closeNotification}
+                />
+            </BrowserRouter>
+        </>
+    );
 };
 
 export default App;

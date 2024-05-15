@@ -1,12 +1,15 @@
 # pylint: disable=no-member
 """Contains the API endpoints used for authentication and related
 """
+import json
 from django.contrib.auth.models import User
 from django.http import HttpRequest, JsonResponse
 
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from .jwt import generate_token, requires_jwt
+
+import boto3
 
 @requires_jwt
 @api_view(["GET"])
@@ -77,3 +80,28 @@ def login_view(request: HttpRequest) -> JsonResponse:
     response.set_cookie("jwt", generate_token(user))
 
     return response
+
+@api_view(["POST"])
+def teste(request: HttpRequest) -> JsonResponse:
+    """Build the request to schedulle the medical appointment
+
+    Args:
+        request (HttpRequest): the requested data
+
+    Returns:
+        JsonResponse: a message with success or errors
+    """
+
+    data = request.data.get("data")
+    hora = int(request.data.get("horario"))
+    especialidade = int(request.data.get("especialidade"))
+    medico = request.data.get("medico")
+    
+    try:
+        sf = boto3.client('stepfunctions', region_name = 'us-east-1')
+        input_sf = json.dumps({"data": data, "hora": hora, "especialidade": especialidade, "medico": medico})
+        response = sf.start_execution(stateMachineArn = 'arn:aws:states:us-east-1:391059373021:stateMachine:InsereMarcacao', input = input_sf)
+    except Exception as e:
+        return JsonResponse({"message": e})  
+    
+    return JsonResponse(response)

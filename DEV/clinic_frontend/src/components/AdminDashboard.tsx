@@ -74,7 +74,7 @@ const AdminDashboard = ({
     return (
         <div className="d-flex gap-5 flex-column h-75 align-items-sm-start align-items-center">
             <div>
-                <h1>Appointments</h1>
+                <h1>Lista de Consultas</h1>
                 <ListGroup as="ol" numbered>
                     {appointmentData.map((data, index) => (
                         <ListGroup.Item
@@ -87,7 +87,7 @@ const AdminDashboard = ({
                                     {data.user.username}
                                     {data.estado === "open" && (
                                         <Badge bg="primary" pill>
-                                            Open
+                                            Aberta
                                         </Badge>
                                     )}
                                 </div>
@@ -101,7 +101,7 @@ const AdminDashboard = ({
                                     handleCloseAppointment(data.id, index)
                                 }
                             >
-                                Close
+                                Fechar
                             </Button>
                         </ListGroup.Item>
                     ))}
@@ -111,12 +111,12 @@ const AdminDashboard = ({
             <div className="d-flex gap-3 flex-sm-row flex-column flex-wrap w-50">
                 <Card style={{ width: "18rem" }}>
                     <Card.Body>
-                        <Card.Title>Facial Recognition</Card.Title>
+                        <Card.Title>Reconhecimento Facial</Card.Title>
                         <Card.Text>
-                            Verify a client's appointment with facial
-                            recognition software.
+                            Verificar a consulta de um cliente através de
+                            software de reconhecimento facial.
                         </Card.Text>
-                        <Button variant="primary">Go</Button>
+                        <Button variant="primary">Ir</Button>
                     </Card.Body>
                 </Card>
             </div>

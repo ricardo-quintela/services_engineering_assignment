@@ -13,7 +13,7 @@ const ToastNotification = ({
     ...rest
 }: ToastNotificationProps) => {
     return (
-        <Toast className="mb-2" {...rest}>
+        <Toast {...rest}>
             <Toast.Header>
                 <img
                     src="holder.js/20x20?text=%20"

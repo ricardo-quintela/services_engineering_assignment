@@ -28,5 +28,7 @@ jobs:
         pip install -r DEV/clinic/requirements.txt
     - name: Run Tests
       run: |
+        chmod +x set_environment.sh
+        source set_environment.sh
         python manage.py test
       working-directory: ./DEV/clinic

@@ -13,7 +13,6 @@ class JwtPayload(BaseModel):
     """A valid structure of a JWT"""
 
     username: str
-    password: str
     timestamp: float
     role: str | None
 
@@ -32,12 +31,11 @@ def generate_token(user: User) -> str:
 
     jwt_payload = JwtPayload(
         username=user.username,
-        password=user.password,
         timestamp=datetime.now().timestamp(),
         role=role.name if role is not None else None
     )
 
-    return jwt.encode(jwt_payload.dict(), SECRET_KEY, JWT_ALGORITHM)
+    return jwt.encode(jwt_payload.model_dump(), SECRET_KEY, JWT_ALGORITHM)
 
 
 def validate_token(token: str) -> dict[str, str | float] | None:
@@ -126,3 +124,36 @@ def requires_jwt(
         return endpoint(*args, **kwargs)
 
     return wrapper
+
+
+def perm_required(perm: str | None) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
+    def decorator(endpoint: Callable[[HttpRequest, Any], HttpResponse]) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
+
+        error_message = {"error": "User is not logged in."}
+        permission_error_message = {"error": "Forbidden."}
+
+        def wrapper(*args, **kwargs):
+            try:
+                token = args[0].COOKIES["jwt"]
+            except KeyError:
+                return JsonResponse(error_message)
+
+            payload = validate_token(token)
+            if payload is None:
+                return JsonResponse(error_message)
+
+            jwt_payload = verify_format(payload)
+            if jwt_payload is None:
+                return JsonResponse(error_message)
+
+            if not verify_expiry(jwt_payload):
+                return JsonResponse(error_message)
+
+            if perm != jwt_payload.role:
+                return JsonResponse(permission_error_message)
+
+            return endpoint(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

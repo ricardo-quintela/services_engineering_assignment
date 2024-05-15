@@ -1,22 +1,17 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FormEvent } from "react";
-import { NotificationData } from "./NotificationManager";
+import { LoginReponseData } from "../interfaces/login";
+import { NotificationData } from "../interfaces/notification";
 
 axios.defaults.withCredentials = true;
-
-export interface LoginReponseData {
-	error?: string;
-	message?: string;
-	role?: "admin" | null;
-}
 
 const LoginForm = ({
 	addNotification,
 	completeLogin,
 }: {
 	addNotification: (notificationData: NotificationData) => void;
-	completeLogin: (loginReponseData: LoginReponseData) => void;
+	completeLogin: () => void;
 }) => {
 	const formInputs = {
 		usernameInput: (
@@ -48,7 +43,7 @@ const LoginForm = ({
 							: response.data["error"],
 				});
 
-				if ("message" in response.data) completeLogin(response.data);
+				if ("message" in response.data) completeLogin();
 			})
 			.catch(() =>
 				addNotification({

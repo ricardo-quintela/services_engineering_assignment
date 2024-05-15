@@ -48,8 +48,8 @@ class TestUserEndPoints(BaseTestCase):
         self.assertJSONEqual(
             response.content,
             [
-                {"id": i, "username": f"test_user{i}"}
-                for i in range(1, len(self.users)+1)
+                {"id": i, "username": f"{(self.users+self.admins)[i-1].username}"}
+                for i in range(1, len(self.users)+len(self.admins)+1)
             ]
         )
 
@@ -69,7 +69,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_invalid_user(self):
         """Tests if getting an invalid user will return an error message
         """
-        user_id = len(self.users)+1
+        user_id = len(self.users)+len(self.admins)+1
         self.client.cookies.load({"jwt": generate_token(self.users[0])})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
@@ -80,7 +80,7 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_invalid_user_not_authenticated(self):
         """Tests if getting an invalid user will return an error message
         """
-        user_id = len(self.users)+1
+        user_id = len(self.users)+len(self.admin)+1
         self.client.cookies.load({"jwt": INVALID_TOKEN})
         response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(

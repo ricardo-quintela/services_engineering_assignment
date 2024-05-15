@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "./ToastNotification";
 import { NotificationData } from "../interfaces/notification";
+import { ToastContainer } from "react-bootstrap";
 
 const NotificationManager = ({
     notificationQueue,
@@ -10,7 +11,7 @@ const NotificationManager = ({
     closeNotification: (index: number) => void;
 }) => {
     return (
-        <div className="position-absolute end-0 me-5 bottom-0 mb-5">
+        <ToastContainer className="me-2 mb-2" position="bottom-end">
             {notificationQueue.map((notificationData, index) => (
                 <ToastNotification
                     key={index}
@@ -20,7 +21,7 @@ const NotificationManager = ({
                     onClose={() => closeNotification(index)}
                 />
             ))}
-        </div>
+        </ToastContainer>
     );
 };
 

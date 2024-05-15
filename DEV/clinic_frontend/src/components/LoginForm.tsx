@@ -1,7 +1,6 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FormEvent } from "react";
-import { LoginReponseData } from "../interfaces/login";
 import { NotificationData } from "../interfaces/notification";
 
 axios.defaults.withCredentials = true;

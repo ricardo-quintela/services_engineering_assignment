@@ -2,16 +2,24 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import App from "./components/App";
+import App_Schedulling from "./components/App_Schedulling";
+import { BrowserRouter , Route, Routes, redirect } from "react-router-dom";
+import App_Login from "./components/App";
 
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
 );
 root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
+    <>
+    <BrowserRouter>
+        <Routes>
+            <Route path="/" element={<App_Schedulling />}></Route>
+            <Route path="/Marcacao" element={<App_Schedulling />}></Route>
+            <Route path="/Login" element={<App_Login />}></Route>
+        </Routes>
+    </BrowserRouter>
+    </>
 );
 
 // If you want to start measuring performance in your app, pass a function

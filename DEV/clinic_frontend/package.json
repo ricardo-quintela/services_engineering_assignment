@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@types/react-transition-group": "^4.4.10",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "react-router-dom": "^6.23.1"
   }
 }

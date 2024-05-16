@@ -60,14 +60,18 @@ def main():
 
     s3 = boto3.client("s3", endpoint_url=endpoint_url)
 
-    for root, _, files in os.walk(build_directory):
+    for root, dirs, files in os.walk(build_directory):
         for file in files:
             file_path = os.path.join(root, file)
             print(f"Uploading: {os.path.join(root, file)}")
+            if "\\" in file_path:
+                file_key = file_path.removeprefix(build_directory + "\\")
+            else:
+                file_key = file_path.removeprefix(build_directory + "/")
             s3.upload_file(
                 file_path,
                 bucket_name,
-                os.path.join(".", file_path.removeprefix(os.path.join("clinic_frontend", "build"))),
+                file_key,
                 ExtraArgs={"ContentType": get_content_type(file)},
             )
 

@@ -6,6 +6,7 @@ import { NotificationData } from "../interfaces/notification";
 import NotificationManager from "./NotificationManager";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SchedullingForm from "./SchedullingForm";
+import axios from "axios";
 
 const App = () => {
     const addNotification = (notificationData: NotificationData) =>

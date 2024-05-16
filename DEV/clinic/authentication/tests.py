@@ -21,9 +21,8 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user(self):
         """Tests if a random user in the database can be returned"""
         user_id = randint(1, len(self.users))
-        response = self.client.get(
-            f"/users/{user_id}/", headers={"jwt": generate_token(self.admins[0])}
-        )
+        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
+        response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(
             response.content, {"id": user_id, "username": f"test_user{user_id}"}
         )
@@ -31,22 +30,21 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user_not_authenticated(self):
         """Tests if a random user in the database can be returned"""
         user_id = randint(1, len(self.users))
-        response = self.client.get(f"/users/{user_id}/", headers={"jwt": INVALID_TOKEN})
+        self.client.cookies.load({"jwt": INVALID_TOKEN})
+        response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_get_user_not_admin(self):
         """Tests if a random user in the database can be returned"""
         user_id = randint(1, len(self.users))
-        response = self.client.get(
-            f"/users/{user_id}/", headers={"jwt": generate_token(self.users[0])}
-        )
+        self.client.cookies.load({"jwt": generate_token(self.users[0])})
+        response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
 
     def test_get_all_users(self):
         """Tests if all the users in the database are returned"""
-        response = self.client.get(
-            "/users/", headers={"jwt": generate_token(self.admins[0])}
-        )
+        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
+        response = self.client.get("/users/")
         self.assertJSONEqual(
             response.content,
             [
@@ -57,21 +55,22 @@ class TestUserEndPoints(BaseTestCase):
 
     def test_get_all_users_not_authenticated(self):
         """Tests if a random user in the database can be returned"""
-        response = self.client.get("/users/", headers={"jwt": INVALID_TOKEN})
+        self.client.cookies.load({"jwt": INVALID_TOKEN})
+        response = self.client.get("/users/")
         self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_get_invalid_user(self):
         """Tests if getting an invalid user will return an error message"""
         user_id = len(self.users) + len(self.admins) + 1
-        response = self.client.get(
-            f"/users/{user_id}/", headers={"jwt": generate_token(self.admins[0])}
-        )
+        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
+        response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(response.content, {"error": "User does not exist."})
 
     def test_get_invalid_user_not_authenticated(self):
         """Tests if getting an invalid user will return an error message"""
         user_id = len(self.users) + len(self.admins) + 1
-        response = self.client.get(f"/users/{user_id}/", headers={"jwt": INVALID_TOKEN})
+        self.client.cookies.load({"jwt": INVALID_TOKEN})
+        response = self.client.get(f"/users/{user_id}/")
         self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_login_valid_credentials(self):
@@ -100,8 +99,7 @@ class TestUserEndPoints(BaseTestCase):
         self.assertJSONEqual(response.content, {"error": "Invalid password."})
 
     def test_register(self):
-        """Tests if a new user can register on the website
-        """
+        """Tests if a new user can register on the website"""
         response = self.client.post(
             "/register/",
             data={
@@ -112,8 +110,7 @@ class TestUserEndPoints(BaseTestCase):
         self.assertJSONEqual(response.content, {"message": "Successfully registered."})
 
     def test_register_username_exists(self):
-        """Tests if a new user can register on the website
-        """
+        """Tests if a new user can register on the website"""
         response = self.client.post(
             "/register/",
             data={

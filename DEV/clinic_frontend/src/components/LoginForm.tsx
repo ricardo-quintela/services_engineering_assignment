@@ -5,6 +5,7 @@ import { NotificationData } from "../interfaces/notification";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
+import { setCookie } from "../cookies";
 
 axios.defaults.withCredentials = true;
 
@@ -46,9 +47,10 @@ const LoginForm = ({
 				});
 
 				if ("message" in response.data) {
-                    
-					axios.defaults.headers.common["jwt"] = response.headers["jwt"];
-					const jwt_payload: JwtPayload = jwtDecode(response.headers["jwt"]);
+					const jwt_token = response.headers["jwt"];
+					setCookie("jwt", jwt_token);
+
+					const jwt_payload: JwtPayload = jwtDecode(jwt_token);
 					if (jwt_payload.role === "admin") {
 						navigate("/admin");
 					} else {

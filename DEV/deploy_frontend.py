@@ -67,7 +67,7 @@ def main():
             s3.upload_file(
                 file_path,
                 bucket_name,
-                file_path.removeprefix(os.path.join("clinic_frontend", "build") + "/"),
+                os.path.join(".", file_path.removeprefix(os.path.join("clinic_frontend", "build"))),
                 ExtraArgs={"ContentType": get_content_type(file)},
             )
 

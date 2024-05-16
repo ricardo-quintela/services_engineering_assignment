@@ -32,7 +32,7 @@ EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 
 ALLOWED_HOSTS = [
     EBS_URL,
-    "172.31.8.243"
+    "172.31.19.85"
 ]
 
 CORS_ALLOWED_ORIGINS = [

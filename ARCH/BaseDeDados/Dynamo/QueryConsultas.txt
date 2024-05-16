@@ -1,0 +1,61 @@
+Exemplo Output:
+
+{
+    "Count": 1,
+    "Items": [
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-01"
+        },
+        "especialidade": {
+          "S": "3"
+        },
+        "hora": {
+          "S": "11"
+        },
+        "medico": {
+          "S": "Mulher"
+        }
+      }
+    ],
+    "ScannedCount": 1
+}
+
+Como se faz uma query?
+Temos de mandar o seguinte input:
+
+{
+    "TableName": "NOME",
+    "KeyConditionExpression": "cliente = :cliente and #data = :data_value", # Escolhemos o que queremos comparar
+    "ExpressionAttributeNames": {      # Isto é para quando temos palavras reservadas como data, dizemos que data vai ser identificado como #data na expressão acima
+      "#data": "data"
+    },
+    "ExpressionAttributeValues": {     # Substituimos os valores que usamos na condição
+      ":cliente": {
+        "S": "manel"
+      },
+      ":data_value": {
+        "S": "2024-05-01"
+      }
+    }
+  }
+
+  {
+    "cliente": "manuel",
+    "data": "2000-05-20",
+    "hora": 10,
+    "especialidade": 2,
+    "medico": "manel2"
+  }
+
+  {
+    "TableName": "Medicos",
+    "KeyConditionExpression": "medico = :medico and #horario = :horario",
+    "ExpressionAttributeValues": {
+      ":cliente.$": "$.body.cliente",
+      ":horario.$": "$.body.horario"
+    }
+  }

@@ -26,8 +26,8 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-EBS_URL = os.environ.get("EBS_URL", "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com")
-EBS_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://frontend.clinic.s3-website-us-east-1.amazonaws.com")
+EBS_URL = os.environ.get("EBS_URL", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+EBS_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 
 ALLOWED_HOSTS = [

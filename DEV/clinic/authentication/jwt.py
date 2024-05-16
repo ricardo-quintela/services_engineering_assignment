@@ -32,7 +32,7 @@ def generate_token(user: User) -> str:
     jwt_payload = JwtPayload(
         username=user.username,
         timestamp=datetime.now().timestamp(),
-        role=role.name if role is not None else None
+        role=role.name if role is not None else None,
     )
 
     return jwt.encode(jwt_payload.model_dump(), SECRET_KEY, JWT_ALGORITHM)
@@ -106,7 +106,7 @@ def requires_jwt(
 
     def wrapper(*args, **kwargs):
         try:
-            token = args[0].headers["jwt"]
+            token = args[0].COOKIES["jwt"]
         except KeyError:
             return JsonResponse(error_message)
 
@@ -126,8 +126,18 @@ def requires_jwt(
     return wrapper
 
 
-def perm_required(perm: str | None) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
-    def decorator(endpoint: Callable[[HttpRequest, Any], HttpResponse]) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
+def perm_required(
+    *perms: str | None,
+) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
+    """Ensures only a User with the given permissions can access the endpoint
+
+    Returns:
+        Callable[[HttpRequest, Any], JsonResponse | HttpResponse]: _description_
+    """
+
+    def decorator(
+        endpoint: Callable[[HttpRequest, Any], HttpResponse]
+    ) -> Callable[[HttpRequest, Any], JsonResponse | HttpResponse]:
 
         error_message = {"error": "User is not logged in."}
         permission_error_message = {"error": "Forbidden."}
@@ -149,7 +159,7 @@ def perm_required(perm: str | None) -> Callable[[HttpRequest, Any], JsonResponse
             if not verify_expiry(jwt_payload):
                 return JsonResponse(error_message)
 
-            if perm != jwt_payload.role:
+            if jwt_payload.role not in perms:
                 return JsonResponse(permission_error_message)
 
             return endpoint(*args, **kwargs)

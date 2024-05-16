@@ -148,9 +148,9 @@ This command should be used to refresh changes made in the source code files.
 cd clinic_frontend
 npm run build
 cd ..
-python deploy_frontend.py [-e s3_endpoint_url]
+python deploy_frontend.py [ -e s3_endpoint_url ] { -b bucket_name } { -d directory }
 ```
 
-`-e` flag should be used for the docker container (`http://localhost:9090`).
+`-e` flag should be used for the docker container (ex. `http://localhost:9090`).
 
-If the target S3 bucket lives on the AWS cloud then not providing the `-e` should suffice.
+If the target S3 bucket lives on the AWS cloud then not providing the `-e` is enough to push the files.

@@ -6,5 +6,5 @@ export interface AppointmentData {
     horario: string;
     especialidade: string;
     medico: string;
-    estado: "open" | "closed";
+    estado: "open" | "closed" | "ongoing" | "payed";
 }

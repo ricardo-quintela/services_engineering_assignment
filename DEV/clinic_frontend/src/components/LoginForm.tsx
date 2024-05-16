@@ -46,21 +46,9 @@ const LoginForm = ({
 				});
 
 				if ("message" in response.data) {
-                    console.log(document.cookie);
-
-					const cookies = document.cookie
-						.trim()
-						.split(";")
-						.map((value) => value.trim().split("="))
-						.reduce((accumulator, value) => {
-							accumulator[value[0]] = value[1];
-							return accumulator;
-						}, {} as { [name: string]: string });
                     
-                    console.table(cookies);
-
-					const jwt_payload: JwtPayload = jwtDecode(cookies["jwt"]);
-
+					axios.defaults.headers.common["jwt"] = response.headers["jwt"];
+					const jwt_payload: JwtPayload = jwtDecode(response.headers["jwt"]);
 					if (jwt_payload.role === "admin") {
 						navigate("/admin");
 					} else {

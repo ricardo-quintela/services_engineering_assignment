@@ -28,7 +28,7 @@ DEBUG = True
 
 EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
 DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
-EBS_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+EBS_BUCKET_URL = os.environ.get("EBS_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 
 # RDS

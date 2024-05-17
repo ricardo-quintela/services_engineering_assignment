@@ -19,5 +19,21 @@ export function getCookies() {
  * @param value the value of the cookie
  */
 export function setCookie(name: string, value: string) {
-    document.cookie = `${name}=${value}; `
+    document.cookie = `${name}=${value}; `;
+}
+
+/**
+ * Removes a cookie in the document
+ * @param name the name of the cookie
+ */
+export function removeCookie(name: string) {
+    const cookies = getCookies();
+
+    document.cookie = "";
+
+    console.log(Object.keys(cookies)
+        .filter((key) => key !== name));
+        // .forEach((key) => {
+        //     document.cookie = `${name}=${cookies[key]}; `;
+        // });
 }

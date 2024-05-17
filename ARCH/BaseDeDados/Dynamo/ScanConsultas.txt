@@ -1,0 +1,144 @@
+Exemplo output:
+
+{
+    "Count": 8,
+    "Items": [
+      {
+        "cliente": {
+          "S": "teste"
+        },
+        "data": {
+          "S": "a"
+        },
+        "especialidade": {
+          "S": "10"
+        },
+        "hora": {
+          "S": "10"
+        },
+        "medico": {
+          "S": "10"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-01"
+        },
+        "especialidade": {
+          "S": "3"
+        },
+        "hora": {
+          "S": "11"
+        },
+        "medico": {
+          "S": "Mulher"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-02"
+        },
+        "especialidade": {
+          "S": "1"
+        },
+        "hora": {
+          "S": "11"
+        },
+        "medico": {
+          "S": "/static/media/fisioterapia1.e01cc5f8e632884c72c8.jpg"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-05"
+        },
+        "especialidade": {
+          "S": "2"
+        },
+        "hora": {
+          "S": "12"
+        },
+        "medico": {
+          "S": "/static/media/fisioterapia1.e01cc5f8e632884c72c8.jpg"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-08"
+        },
+        "especialidade": {
+          "S": "3"
+        },
+        "hora": {
+          "S": "12"
+        },
+        "medico": {
+          "S": "/static/media/fisioterapia1.e01cc5f8e632884c72c8.jpg"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-16"
+        },
+        "especialidade": {
+          "S": "1"
+        },
+        "hora": {
+          "S": "11"
+        },
+        "medico": {
+          "S": "/static/media/fisioterapia1.e01cc5f8e632884c72c8.jpg"
+        }
+      },
+      {
+        "cliente": {
+          "S": "manel"
+        },
+        "data": {
+          "S": "2024-05-17"
+        },
+        "especialidade": {
+          "S": "1"
+        },
+        "hora": {
+          "S": "11"
+        },
+        "medico": {
+          "S": "/static/media/fisioterapia1.e01cc5f8e632884c72c8.jpg"
+        }
+      },
+      {
+        "cliente": {
+          "S": "a"
+        },
+        "data": {
+          "S": "a"
+        },
+        "especialidade": {
+          "S": "10"
+        },
+        "hora": {
+          "S": "10"
+        },
+        "medico": {
+          "S": "a"
+        }
+      }
+    ],
+    "ScannedCount": 8
+  }

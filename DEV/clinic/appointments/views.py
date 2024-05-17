@@ -62,7 +62,7 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
     
     try:
         sf = boto3.client('stepfunctions', region_name = 'us-east-1')
-        input_sf = json.dumps({"cliente": username, "data": data, "hora": hora, "especialidade": especialidade, "medico": medico})
+        input_sf = json.dumps({"cliente": username, "data": data, "hora": hora, "especialidade": especialidade, "medico": medico, "estado": "Não Pago"})
         response = sf.start_execution(stateMachineArn = 'arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao', input = input_sf)
     except Exception as e:
         return JsonResponse({"message": e})  

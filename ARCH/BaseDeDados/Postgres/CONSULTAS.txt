@@ -1,0 +1,11 @@
+Criação da tabela:
+
+CREATE TABLE CONSULTAS (
+	username	VARCHAR(100),
+	data_appoitment	VARCHAR(100),
+	hora	INTEGER,
+	especialidade	INTEGER,
+	medico	VARCHAR(100),
+	estado VARCHAR(100)
+);
+

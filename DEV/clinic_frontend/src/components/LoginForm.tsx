@@ -52,14 +52,13 @@ const LoginForm = ({
 
 					const jwt_payload: JwtPayload = jwtDecode(jwt_token);
 					if (jwt_payload.role === "admin") {
-						navigate("/admin");
+						navigate("/");
 					} else {
-						navigate("/scheduling");
+						navigate("/");
 					}
 				}
 			})
-			.catch((e) => {
-				console.log(e);
+			.catch(() => {
 				addNotification({
 					title: "Error",
 					message: "An error has occured while attempting to login.",

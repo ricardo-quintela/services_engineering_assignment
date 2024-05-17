@@ -26,13 +26,22 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-EBS_URL = os.environ.get("EBS_URL", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
 EBS_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 
+# RDS
+RDS_NAME = os.environ.get("RDS_NAME", "rds.clinic")
+RDS_HOST = os.environ.get("RDS_HOST", "localhost")
+RDS_PORT = os.environ.get("RDS_PORT", "5432")
+RDS_USER = os.environ.get("RDS_USER", "postgres")
+RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")
+
+
 ALLOWED_HOSTS = [
-    EBS_URL,
-    "172.31.8.243"
+    EBS_HOST,
+    DYNAMO_HOST
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -101,8 +110,12 @@ WSGI_APPLICATION = "clinic.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "USER": RDS_USER,
+        "NAME": RDS_NAME,
+        "PASSWORD": RDS_PASSWORD,
+        "HOST": RDS_HOST,
+        "PORT": RDS_PORT
     }
 }
 
@@ -129,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt"
 
 TIME_ZONE = "UTC"
 

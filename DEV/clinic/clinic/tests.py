@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
+from django.core.management import call_command
 
 NUM_USERS = 10
 
@@ -8,10 +9,11 @@ class BaseTestCase(TestCase):
     """Sets Up the database and test client for the tests
     """
 
-    @override_settings(EBS_URL="localhost")
+    @override_settings(EBS_HOST="localhost")
     @override_settings(S3_BUCKET_URL="http://127.0.0.1:9090")
     @override_settings(S3_BUCKET_NAME="frontend")
     def setUp(self) -> None:
+        call_command('flush', '--noinput')
         self.client = APIClient()
         self.users: list[User] = list()
         self.admins: list[User] = list()

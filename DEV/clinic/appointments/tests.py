@@ -8,7 +8,7 @@ from authentication.serializers import UserSerializer
 from authentication.jwt import generate_token
 from clinic.tests import BaseTestCase, INVALID_TOKEN
 
-from .models import Appointment
+from .models import Consultas
 
 NUM_APPOINTMENTS = 3
 
@@ -23,10 +23,11 @@ class TestAppointments(BaseTestCase):
         now = datetime.now()
 
         for i in range(NUM_APPOINTMENTS):
-            appointment = Appointment.objects.create(
+            appointment = Consultas.objects.create(
                 user=self.users[i],
-                horario=f"{now.date()}|{now.time()}",
-                especialidade="specialty",
+                data_appointment=f"{now.date()}",
+                hora=10,
+                especialidade=2,
                 medico="doctor",
                 estado="open",
             )
@@ -43,7 +44,8 @@ class TestAppointments(BaseTestCase):
                 {
                     "id": appointment.id,
                     "user": UserSerializer(appointment.user).data,
-                    "horario": appointment.horario,
+                    "data_appointment": appointment.data_appointment,
+                    "hora": appointment.hora,
                     "especialidade": appointment.especialidade,
                     "medico": appointment.medico,
                     "estado": appointment.estado,
@@ -69,7 +71,8 @@ class TestAppointments(BaseTestCase):
             {
                 "id": self.appointments[0].id,
                 "user": UserSerializer(self.appointments[0].user).data,
-                "horario": self.appointments[0].horario,
+                "data_appointment": self.appointments[0].data_appointment,
+                "hora": self.appointments[0].hora,
                 "especialidade": self.appointments[0].especialidade,
                 "medico": self.appointments[0].medico,
                 "estado": "closed",
@@ -107,12 +110,15 @@ class TestAppointments(BaseTestCase):
         response = self.client.post(
             "/scheduling/",
             data={
+                "cliente": "rafa",
                 "data": "123",
                 "horario": 12,
                 "especialidade": 2,
-                "medico": "doctor"
+                "medico": "doctor",
+                "estado": "open"
             }
         )
+        print(response.content)
         self.assertTrue("message" in json.loads(response.content))
 
     def test_scheduling_not_authenticated(self):
@@ -123,7 +129,7 @@ class TestAppointments(BaseTestCase):
             "/scheduling/",
             data={
                 "data": "123",
-                "horario": 12,
+                "hora": 12,
                 "especialidade": 2,
                 "medico": "doctor"
             }
@@ -140,7 +146,7 @@ class TestAppointments(BaseTestCase):
         response = self.client.post(
             "/scheduling/",
             data={
-                "horario": 12,
+                "hora": 12,
                 "especialidade": 2,
                 "medico": "doctor"
             }

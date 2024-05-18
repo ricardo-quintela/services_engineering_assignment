@@ -1,6 +1,5 @@
 # pylint: disable=no-member
 import json
-import boto3
 import time
 
 from django.http import HttpRequest, JsonResponse
@@ -8,12 +7,14 @@ from django.core.exceptions import FieldDoesNotExist
 
 from rest_framework.decorators import api_view
 from authentication.jwt import perm_required, validate_token, requires_jwt
+from aws_middleware.stepfunctions import client
 
 from .models import Consultas
 from .serializers import AppointmentSerializer
 
-MAX_RETRIES=3
-TIMEOUT=1
+
+MAX_RETRIES = 3
+TIMEOUT = 1
 
 
 @perm_required("admin")
@@ -72,39 +73,40 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
     token = request.headers["jwt"]
     username = validate_token(token)["username"]
 
+    input_sf = json.dumps(
+        {
+            "cliente": username,
+            "data": data,
+            "hora": hora,
+            "especialidade": especialidade,
+            "medico": medico,
+            "estado": "open",
+        }
+    )
+
     try:
-        sf = boto3.client("stepfunctions", region_name="us-east-1")
-        input_sf = json.dumps(
-            {
-                "cliente": username,
-                "data": data,
-                "hora": hora,
-                "especialidade": especialidade,
-                "medico": medico,
-                "estado": "open"
-            }
-        )
-        response = sf.start_execution(
-            stateMachineArn="arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
+        response = client.start_execution(
+            stateMachineArn="arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
             input=input_sf,
         )
-        execution_arn = response['executionArn']
-
-        for _ in range(MAX_RETRIES):
-            response = sf.describe_execution(
-                executionArn=execution_arn
-            )
-
-            status = response['status']
-
-            if status in ['SUCCEEDED', 'FAILED', 'TIMED_OUT', 'ABORTED']:
-                if status == 'FAILED':
-                    return JsonResponse({"message": response['error'], "statusCode": 500})
-                return JsonResponse({"message": "Insertion succeded", "statusCode": 200})
-
-            time.sleep(1)
-
-        return JsonResponse({"error": "Step function execution timed out."})
+        execution_arn = response["executionArn"]
 
     except Exception as e:
         return JsonResponse({"error": str(e)})
+
+    for _ in range(MAX_RETRIES):
+        try:
+            response = client.describe_execution(executionArn=execution_arn)
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+
+        status = response["status"]
+
+        if status in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]:
+            if status == "FAILED":
+                return JsonResponse({"message": response["error"], "statusCode": 500})
+            return JsonResponse({"message": "Insertion succeded", "statusCode": 200})
+
+        time.sleep(1)
+
+    return JsonResponse({"error": "Step function execution timed out."})

@@ -25,10 +25,10 @@ const App = () => {
     );
 
     const checkAdmin = () =>
-        (getCookies()["jwt"] &&
-            (jwtDecode(getCookies()["jwt"]) as JwtPayload).role) === "admin";
+        (localStorage.getItem("jwt") &&
+            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role) === "admin";
 
-	const checkLogin = () => getCookies()["jwt"] !== "";
+	const checkLogin = () => localStorage.getItem("jwt") !== "";
 
     return (
         <>

@@ -59,7 +59,7 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
 
     try:
         data = request.data["data"]
-        hora = int(request.data["horario"])
+        hora = int(request.data["hora"])
         especialidade = int(request.data["especialidade"])
         medico = request.data["medico"]
     except KeyError:
@@ -83,7 +83,7 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             }
         )
         response = sf.start_execution(
-            stateMachineArn="arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
+            stateMachineArn="arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
             input=input_sf,
         )
         execution_arn = response['executionArn']

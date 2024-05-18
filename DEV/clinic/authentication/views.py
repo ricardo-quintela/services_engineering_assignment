@@ -1,7 +1,7 @@
 # pylint: disable=no-member
 """Contains the API endpoints used for authentication and related
 """
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.http import HttpRequest, JsonResponse
 from django.db.utils import IntegrityError
 
@@ -72,7 +72,6 @@ def register_view(request: HttpRequest) -> JsonResponse:
     user.save()
 
     return JsonResponse({"message": "Successfully registered."})
-
 
 @api_view(["POST"])
 def login_view(request: HttpRequest) -> JsonResponse:

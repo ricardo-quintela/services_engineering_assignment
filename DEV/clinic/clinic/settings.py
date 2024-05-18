@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 DEBUG = True
 
 EBS_HOST = os.environ.get("EBS_HOST", "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
-DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.15.132")  # "172.31.8.243"
+DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.13.240")  # "172.31.8.243"
 EBS_BUCKET_URL = os.environ.get("EBS_BUCKET_URL", "http://frontend.clinic.s3-website-us-east-1.amazonaws.com") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 

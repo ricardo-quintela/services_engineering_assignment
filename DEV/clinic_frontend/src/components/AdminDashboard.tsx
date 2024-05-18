@@ -102,14 +102,15 @@ const AdminDashboard = ({
 										</Badge>
 									)}
 								</div>
-								{data.horario.replace("|", " at ")} - {" "}
+								{data.data_appointment} - {" "}
+								{data.hora} - {" "}
 								{data.medico}
 							</div>
 
 							<Button
 								disabled={data.estado === "closed"}
 								onClick={() =>
-									handleCloseAppointment(data.id, index)
+									handleCloseAppointment(data.user.id, index)
 								}
 							>
 								Fechar

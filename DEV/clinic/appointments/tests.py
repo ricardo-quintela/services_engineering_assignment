@@ -1,12 +1,12 @@
 """Tests appointment related endpoints
 """
-
 # pylint: disable=no-member
+import json
 from datetime import datetime
 
 from authentication.serializers import UserSerializer
 from authentication.jwt import generate_token
-from clinic.tests import BaseTestCase
+from clinic.tests import BaseTestCase, INVALID_TOKEN
 
 from .models import Appointment
 
@@ -98,3 +98,54 @@ class TestAppointments(BaseTestCase):
         )
 
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
+
+
+    def test_scheduling(self):
+        """Tests if a regular user can schedule an appointment"""
+        self.client.cookies.load({"jwt": generate_token(self.users[0])})
+
+        response = self.client.post(
+            "/scheduling/",
+            data={
+                "data": "123",
+                "horario": 12,
+                "especialidade": 2,
+                "medico": "doctor"
+            }
+        )
+        self.assertTrue("message" in json.loads(response.content))
+
+    def test_scheduling_not_authenticated(self):
+        """Tests if a regular user that is not logged in cannot schedule an appointment"""
+        self.client.cookies.load({"jwt": INVALID_TOKEN})
+
+        response = self.client.post(
+            "/scheduling/",
+            data={
+                "data": "123",
+                "horario": 12,
+                "especialidade": 2,
+                "medico": "doctor"
+            }
+        )
+        self.assertJSONEqual(
+            response.content,
+            {"error": "User is not logged in."}
+        )
+
+    def test_scheduling_invalid_payload(self):
+        """Tests if an invalid payload is blocked"""
+        self.client.cookies.load({"jwt": generate_token(self.users[0])})
+
+        response = self.client.post(
+            "/scheduling/",
+            data={
+                "horario": 12,
+                "especialidade": 2,
+                "medico": "doctor"
+            }
+        )
+        self.assertJSONEqual(
+            response.content,
+            {"error": "Invalid payload."}
+        )

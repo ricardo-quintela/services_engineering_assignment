@@ -6,6 +6,8 @@ import { FormEvent, useState } from "react";
 import primeiraImagem from "../img/fisioterapia1.jpg";
 import segundaImagem from "../img/fisioterapia.jpg";
 
+axios.defaults.withCredentials = true;
+
 function SchedullingForm() {
     // Mexemos na imagem e guardamos o estado atual
     const [imagemAtual, setImagemAtual] = useState(primeiraImagem);
@@ -27,7 +29,7 @@ function SchedullingForm() {
         };
 
         axios
-            .post(process.env.REACT_APP_API_URL + "marcacao/", {
+            .post(process.env.REACT_APP_API_URL + "scheduling/", {
                 data: payload.inputData.value,
                 horario: payload.inputHora.value,
                 especialidade: payload.inputEspecialidade.value,

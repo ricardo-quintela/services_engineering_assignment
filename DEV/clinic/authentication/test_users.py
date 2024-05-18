@@ -1,11 +1,11 @@
 from random import randint
+from unittest.mock import patch
 
-from moto import mock_aws
 import boto3
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from clinic.tests import BaseTestCase, INVALID_TOKEN
-from clinic.settings import S3_IMAGE_BUCKET_NAME
+from clinic.settings import MAX_FILE_SIZE
 
 from .jwt import generate_token
 
@@ -13,20 +13,6 @@ from .jwt import generate_token
 # Create your tests here.
 class TestUserEndPoints(BaseTestCase):
     """Tests all the User model related endpoints"""
-
-    def setUp(self):
-        super().setUp()
-
-        self.mock_aws = mock_aws()
-        self.mock_aws.start()
-
-        s3 = boto3.resource("s3")
-        bucket = s3.Bucket(S3_IMAGE_BUCKET_NAME)
-        bucket.create()
-
-    def tearDown(self) -> None:
-        self.mock_aws.stop()
-        super().tearDown()
 
     def test_get_user(self):
         """Tests if a random user in the database can be returned"""
@@ -63,9 +49,12 @@ class TestUserEndPoints(BaseTestCase):
             ],
         )
 
-    def test_upload_file(self):
+    @patch("aws_middleware.s3.client")
+    def test_upload_file(self, mock_boto_client):
         """Tests if an authenticated user can upload a profile picture
         """
+        mock_boto_client.return_value = boto3.client("s3")
+
         self.client.cookies.load({"jwt": generate_token(self.users[0])})
         image = SimpleUploadedFile("profile.jpg", b"image_content", content_type="image/jpeg")
         response = self.client.post("/image/", {"file": image})
@@ -96,4 +85,16 @@ class TestUserEndPoints(BaseTestCase):
         self.assertJSONEqual(
             response.content,
             {"error": "No image was uploaded."}
+        )
+
+    def test_upload_file_too_big(self):
+        """Stops a request that doesn't contain a file
+        """
+        self.client.cookies.load({"jwt": generate_token(self.users[0])})
+        image = SimpleUploadedFile("profile.jpg", b"a"*(MAX_FILE_SIZE+1), content_type="image/jpeg")
+        response = self.client.post("/image/", data={"file": image})
+
+        self.assertJSONEqual(
+            response.content,
+            {"error": "Uploaded file excedes max size limit."}
         )

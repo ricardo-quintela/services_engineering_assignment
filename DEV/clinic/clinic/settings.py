@@ -29,6 +29,7 @@ DEBUG = True
 EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
 DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
 S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000")
 S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
 
@@ -46,7 +47,7 @@ ALLOWED_HOSTS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    S3_BUCKET_URL
+    S3_STATIC_SITE_URL
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [

@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 DEBUG = True
 
 EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
-DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
+STEP_FUNCTION = os.environ.get("STEP_FUNCTION", "172.31.43.159")
 
 S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") 
 S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
@@ -44,7 +44,8 @@ RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")
 
 ALLOWED_HOSTS = [
     EBS_HOST,
-    DYNAMO_HOST
+    STEP_FUNCTION,
+    "18.208.0.153"
 ]
 
 CORS_ALLOWED_ORIGINS = [

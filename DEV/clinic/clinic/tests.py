@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User, Group
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
-from django.core.management import call_command
 
 NUM_USERS = 10
+INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlcjEiLCJ0aW1lc3RhbXAiOjE3MTUzNDA1NDAuMDAxMjIzLCJyb2xlIjpudWxsfQ.qrmwgNoyxCMRJ5QcmcWuH3DwyjMcqsPYMu438l2BvI0"
 
 class BaseTestCase(TestCase):
     """Sets Up the database and test client for the tests

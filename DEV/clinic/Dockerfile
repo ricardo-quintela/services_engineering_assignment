@@ -1,7 +1,7 @@
 FROM python:3.11
 
 ENV EBS_HOST=localhost
-ENV S3_BUCKET_URL=http://127.0.0.1:9090
+ENV S3_BUCKET_URL=http://s3:9090
 ENV S3_FRONTEND_BUCKET_NAME=frontend.clinic
 ENV S3_IMAGE_BUCKET_NAME=image.clinic
 ENV RDS_NAME=rds.clinic

@@ -16,8 +16,7 @@ import boto3
 @perm_required("admin")
 @api_view(["GET"])
 def all_appointments_view(_: HttpRequest) -> JsonResponse:
-    # user = Consultas(1, "aa", 10, 1, "a", "as")
-    # user.save()
+
     appointments = Consultas.objects.all()
 
     serializer = AppointmentSerializer(appointments, many=True)

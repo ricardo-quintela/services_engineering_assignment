@@ -110,7 +110,7 @@ const AdminDashboard = ({
 							<Button
 								disabled={data.estado === "closed"}
 								onClick={() =>
-									handleCloseAppointment(data.user.id, index)
+									handleCloseAppointment(data.id, index)
 								}
 							>
 								Fechar

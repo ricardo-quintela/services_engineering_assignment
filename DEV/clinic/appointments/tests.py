@@ -4,6 +4,7 @@
 # pylint: disable=no-member
 import json
 from datetime import datetime
+from unittest.mock import patch
 
 from authentication.serializers import UserSerializer
 from authentication.jwt import generate_token
@@ -106,18 +107,14 @@ class TestAppointments(BaseTestCase):
 
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
 
-    def test_scheduling(self):
+    @patch("aws_middleware.stepfunctions.client.describe_execution")
+    def test_scheduling(self, mock_describer):
         """Tests if a regular user can schedule an appointment"""
+        mock_describer.return_value = {"status": "SUCCEEDED"}
+
         response = self.client.post(
             "/scheduling/",
-            data={
-                "cliente": "rafa",
-                "data": "123",
-                "horario": 12,
-                "especialidade": 2,
-                "medico": "doctor",
-                "estado": "open",
-            },
+            data={"data": "123", "hora": 12, "especialidade": 2, "medico": "doctor"},
             headers={"jwt": generate_token(self.users[0])},
         )
         self.assertTrue("message" in json.loads(response.content))

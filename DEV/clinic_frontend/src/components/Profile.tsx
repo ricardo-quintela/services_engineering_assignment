@@ -18,7 +18,7 @@ const Profile = ({
                         .username
                 }
             </h1>
-            <CameraFeed addNotification={addNotification} />
+            <CameraFeed addNotification={addNotification} uploadTo="image/" />
         </Container>
     );
 };

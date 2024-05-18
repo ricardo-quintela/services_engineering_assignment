@@ -12,8 +12,10 @@ import { NotificationData } from "../interfaces/notification";
 
 const CameraFeed = ({
     addNotification,
+    uploadTo
 }: {
     addNotification: (notificationData: NotificationData) => void;
+    uploadTo: string;
 }) => {
     const videoRef = useRef<any>(null);
     const photoRef = useRef<any>(null);
@@ -58,7 +60,7 @@ const CameraFeed = ({
         formData.append("file", files[0], files[0].name);
 
         axios
-            .post(process.env.REACT_APP_API_URL + "image/", formData)
+            .post(process.env.REACT_APP_API_URL + uploadTo, formData)
             .then((response) => {
                 addNotification({
                     title: "message" in response.data ? "Success" : "Error",

@@ -3,16 +3,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Carousel } from "react-bootstrap";
 import { FormEvent, useState } from "react";
 
-import primeiraImagem from "../img/fisioterapia1.jpg";
-import segundaImagem from "../img/fisioterapia.jpg";
+import atanagildoImagem from "../img/atanagildo.jpg";
+import manuelaImagem from "../img/manuela.jpg";
+import semPreferenciaImagem from "../img/sem_preferencia.png";
+import { NotificationData } from "../interfaces/notification";
+import { getCookies, setCookie } from "../cookies";
 
 axios.defaults.withCredentials = true;
 
 function SchedullingForm() {
     // Mexemos na imagem e guardamos o estado atual
-    const [imagemAtual, setImagemAtual] = useState(primeiraImagem);
+    const [imagemAtual, setImagemAtual] = useState(atanagildoImagem);
     const handleChangeSlide = (eventKey: number) => {
         if (eventKey === 0) {
+            setImagemAtual("NADA");
+        } else if (eventKey === 1){
             setImagemAtual("Homem");
         } else {
             setImagemAtual("Mulher");
@@ -27,15 +32,18 @@ function SchedullingForm() {
             inputHora: { value: string };
             inputEspecialidade: { value: string };
         };
-
+        
         axios
             .post(process.env.REACT_APP_API_URL + "scheduling/", {
                 data: payload.inputData.value,
-                horario: payload.inputHora.value,
+                hora: payload.inputHora.value,
                 especialidade: payload.inputEspecialidade.value,
                 medico: imagemAtual,
+                jwt: document.cookie.split("=")[1].trim()
+            }
+            ).then((response) => {
+                console.log(response);
             })
-            .then((response) => console.log(response))
             .catch((response) => console.log(response));
     };
 
@@ -98,26 +106,46 @@ function SchedullingForm() {
                         onSelect={handleChangeSlide}
                     >
                         <Carousel.Item>
-                            <img
-                                className="d-block mx-auto"
-                                src={primeiraImagem}
-                                alt="Second slide"
-                                style={{
-                                    maxHeight: "100px",
-                                    maxWidth: "100px",
-                                }}
-                            />
+                            <div className="text-center">
+                                <span> Sem preferência </span>
+                                <img
+                                    className="d-block mx-auto"
+                                    src={semPreferenciaImagem}
+                                    alt="Second slide"
+                                    style={{
+                                        maxHeight: "100px",
+                                        maxWidth: "100px",
+                                    }}
+                                />
+                            </div>
                         </Carousel.Item>
                         <Carousel.Item>
-                            <img
-                                className="d-block mx-auto"
-                                src={segundaImagem}
-                                alt="Second slide"
-                                style={{
-                                    maxHeight: "100px",
-                                    maxWidth: "100px",
-                                }}
-                            />
+                            <div className="text-center">
+                                <span> Atanagildo </span>
+                                <img
+                                    className="d-block mx-auto"
+                                    src={atanagildoImagem}
+                                    alt="Second slide"
+                                    style={{
+                                        maxHeight: "100px",
+                                        maxWidth: "100px",
+                                    }}
+                                />
+                            </div>
+                        </Carousel.Item>
+                        <Carousel.Item>
+                            <div className="text-center">
+                                <span> Manuela </span>
+                                <img
+                                    className="d-block mx-auto"
+                                    src={manuelaImagem}
+                                    alt="Second slide"
+                                    style={{
+                                        maxHeight: "100px",
+                                        maxWidth: "100px",
+                                    }}
+                                />
+                            </div>
                         </Carousel.Item>
                     </Carousel>
                 </div>

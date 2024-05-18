@@ -34,8 +34,8 @@ S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.cl
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
 
 # RDS
-RDS_NAME = os.environ.get("RDS_NAME", "rds.clinic")
-RDS_HOST = os.environ.get("RDS_HOST", "localhost")
+RDS_NAME = os.environ.get("RDS_NAME", "Consultas")
+RDS_HOST = os.environ.get("RDS_HOST", "clinic.chmlmnyewbda.us-east-1.rds.amazonaws.com")
 RDS_PORT = os.environ.get("RDS_PORT", "5432")
 RDS_USER = os.environ.get("RDS_USER", "postgres")
 RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")

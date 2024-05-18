@@ -26,14 +26,14 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
-DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
-EBS_BUCKET_URL = os.environ.get("EBS_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+EBS_HOST = os.environ.get("EBS_HOST", "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.15.132")  # "172.31.8.243"
+EBS_BUCKET_URL = os.environ.get("EBS_BUCKET_URL", "http://frontend.clinic.s3-website-us-east-1.amazonaws.com") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
 
 # RDS
-RDS_NAME = os.environ.get("RDS_NAME", "rds.clinic")
-RDS_HOST = os.environ.get("RDS_HOST", "localhost")
+RDS_NAME = os.environ.get("RDS_NAME", "Consultas")
+RDS_HOST = os.environ.get("RDS_HOST", "clinic.chmlmnyewbda.us-east-1.rds.amazonaws.com")
 RDS_PORT = os.environ.get("RDS_PORT", "5432")
 RDS_USER = os.environ.get("RDS_USER", "postgres")
 RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")

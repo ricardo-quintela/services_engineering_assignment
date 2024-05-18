@@ -6,8 +6,12 @@ import { FormEvent, useState } from "react";
 import atanagildoImagem from "../img/atanagildo.jpg";
 import manuelaImagem from "../img/manuela.jpg";
 import semPreferenciaImagem from "../img/sem_preferencia.png";
+import { NotificationData } from "../interfaces/notification";
+import { getCookies, setCookie } from "../cookies";
 
-function SchedullingForm() {
+axios.defaults.withCredentials = true;
+
+function SchedullingForm (){
     // Mexemos na imagem e guardamos o estado atual
     const [imagemAtual, setImagemAtual] = useState(atanagildoImagem);
     const handleChangeSlide = (eventKey: number) => {
@@ -28,15 +32,18 @@ function SchedullingForm() {
             inputHora: { value: string };
             inputEspecialidade: { value: string };
         };
-
+        
         axios
             .post(process.env.REACT_APP_API_URL + "marcacao/", {
                 data: payload.inputData.value,
-                horario: payload.inputHora.value,
+                hora: payload.inputHora.value,
                 especialidade: payload.inputEspecialidade.value,
                 medico: imagemAtual,
+                jwt: document.cookie.split("=")[1].trim()
+            }
+            ).then((response) => {
+                console.log(response);
             })
-            .then((response) => console.log(response))
             .catch((response) => console.log(response));
     };
 

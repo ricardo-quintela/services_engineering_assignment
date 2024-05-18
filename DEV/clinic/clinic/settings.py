@@ -26,10 +26,12 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-EBS_HOST = os.environ.get("EBS_HOST", "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
-DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.15.132")  # "172.31.8.243"
-EBS_BUCKET_URL = os.environ.get("EBS_BUCKET_URL", "http://frontend.clinic.s3-website-us-east-1.amazonaws.com") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
-EBS_BUCKET_NAME = os.environ.get("EBS_BUCKET_NAME", "frontend.clinic")
+EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+DYNAMO_HOST = os.environ.get("DYNAMO_HOST", "172.31.8.243")
+S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000")
+S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
+S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
 
 # RDS
 RDS_NAME = os.environ.get("RDS_NAME", "Consultas")
@@ -45,7 +47,7 @@ ALLOWED_HOSTS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    EBS_BUCKET_URL
+    S3_STATIC_SITE_URL
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -168,3 +170,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # JWT Auth
 JWT_ALGORITHM = "HS256"
 JWT_TOKEN_EXPIRY = 60 * 5
+
+# Files
+MAX_FILE_SIZE = 25 * 1024

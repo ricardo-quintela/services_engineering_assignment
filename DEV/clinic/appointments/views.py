@@ -11,6 +11,7 @@ from .serializers import AppointmentSerializer
 import json
 import boto3
 
+
 @perm_required("admin")
 @api_view(["GET"])
 def all_appointments_view(_: HttpRequest) -> JsonResponse:
@@ -32,7 +33,7 @@ def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
     json_payload: dict = request.data
 
     try:
-        appointment.update(**{k:json_payload.get(k) for k in json_payload})
+        appointment.update(**{k: json_payload.get(k) for k in json_payload})
     except FieldDoesNotExist as e:
         return JsonResponse({"error": f"{e}"})
 
@@ -40,7 +41,8 @@ def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
     return JsonResponse(serializer.data, safe=False)
 
-# @requires_jwt
+
+@requires_jwt
 @api_view(["POST"])
 def schedule_appointment(request: HttpRequest) -> JsonResponse:
     """Build the request to schedulle the medical appointment
@@ -52,22 +54,35 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
         JsonResponse: a message with success or errors
     """
 
-    data = request.data.get("data")
-    hora = int(request.data.get("hora"))
-    especialidade = int(request.data.get("especialidade"))
-    medico = request.data.get("medico")
-    
-    token = request.data.get("jwt")
-    username = validate_token(token)["username"]
-    
-    if username is None:
-        return JsonResponse({"message": "user is not logged in"})
-    
     try:
-        sf = boto3.client('stepfunctions', region_name = 'us-east-1')
-        input_sf = json.dumps({"cliente": username, "data": data, "hora": hora, "especialidade": especialidade, "medico": medico, "estado": "Não Pago"})
-        response = sf.start_execution(stateMachineArn = 'arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao', input = input_sf)
-    except Exception as e:
-        return JsonResponse({"message": e, "token": token})  
+        data = request.data["data"]
+        hora = int(request.data["horario"])
+        especialidade = int(request.data["especialidade"])
+        medico = request.data["medico"]
+    except KeyError:
+        return JsonResponse({"error": "Invalid payload."})
+    except ValueError:
+        return JsonResponse({"error": "Invalid payload."})
 
-    return JsonResponse(response)
+    token = request.COOKIES["jwt"]
+    username = validate_token(token)["username"]
+
+    try:
+        sf = boto3.client("stepfunctions", region_name="us-east-1")
+        input_sf = json.dumps(
+            {
+                "cliente": username,
+                "data": data,
+                "hora": hora,
+                "especialidade": especialidade,
+                "medico": medico,
+            }
+        )
+        response = sf.start_execution(
+            stateMachineArn="arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
+            input=input_sf,
+        )
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
+
+    return JsonResponse({"message": response})

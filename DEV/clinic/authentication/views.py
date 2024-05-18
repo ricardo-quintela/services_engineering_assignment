@@ -1,13 +1,18 @@
 # pylint: disable=no-member
 """Contains the API endpoints used for authentication and related
 """
+
 from django.contrib.auth.models import User
 from django.http import HttpRequest, JsonResponse
 from django.db.utils import IntegrityError
 
 from rest_framework.decorators import api_view
+
+from clinic.settings import MAX_FILE_SIZE, S3_IMAGE_BUCKET_NAME
+from aws_middleware.s3 import s3_upload
 from .serializers import UserSerializer
-from .jwt import generate_token, perm_required
+from .jwt import generate_token, perm_required, requires_jwt, validate_token, verify_format
+
 
 
 @perm_required("admin")
@@ -100,3 +105,24 @@ def login_view(request: HttpRequest) -> JsonResponse:
     response["jwt"] = generate_token(user)
 
     return response
+
+
+@requires_jwt
+@api_view(["POST"])
+def upload_image_view(request: HttpRequest) -> JsonResponse:
+
+    jwt_payload = verify_format(validate_token(request.COOKIES["jwt"]))
+    username = jwt_payload.username
+
+    try:
+        image = request.FILES["file"]
+    except KeyError:
+        return JsonResponse({"error": "No image was uploaded."})
+
+    if image.size > MAX_FILE_SIZE:
+        return JsonResponse({"error": "Uploaded file excedes max size limit."})
+
+    if not s3_upload(image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image):
+        return JsonResponse({"message": "An error occured while uploading the image."})
+
+    return JsonResponse({"message": "Image successfully uploaded."})

@@ -3,9 +3,6 @@ import boto3
 import argparse
 
 import boto3.s3
-import boto3.s3.constants
-import boto3.session
-
 
 def get_content_type(file_path: str):
     extension = os.path.splitext(file_path)[-1]

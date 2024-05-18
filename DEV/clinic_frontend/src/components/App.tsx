@@ -12,6 +12,7 @@ import { getCookies } from "../cookies";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
 import LandingPage from "./LandingPage";
+import CameraFeed from "./CameraFeed";
 
 const App = () => {
     const addNotification = (notificationData: NotificationData) =>
@@ -28,7 +29,7 @@ const App = () => {
         (getCookies()["jwt"] &&
             (jwtDecode(getCookies()["jwt"]) as JwtPayload).role) === "admin";
 
-	const checkLogin = () => getCookies()["jwt"] !== "";
+    const checkLogin = () => getCookies()["jwt"] !== "";
 
     return (
         <>
@@ -39,7 +40,15 @@ const App = () => {
 
                 <section className="h-75">
                     <Routes>
-                        <Route path="/" element={<LandingPage />} />
+                        <Route
+                            path="/"
+                            element={
+                                <>
+                                    <LandingPage />
+                                    <CameraFeed />
+                                </>
+                            }
+                        />
                         <Route
                             path="/scheduling"
                             element={

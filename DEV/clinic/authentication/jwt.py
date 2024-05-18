@@ -106,7 +106,7 @@ def requires_jwt(
 
     def wrapper(*args, **kwargs):
         try:
-            token = args[0].COOKIES["jwt"]
+            token = args[0].headers["jwt"]
         except KeyError:
             return JsonResponse(error_message)
 
@@ -144,7 +144,7 @@ def perm_required(
 
         def wrapper(*args, **kwargs):
             try:
-                token = args[0].COOKIES["jwt"]
+                token = args[0].headers["jwt"]
             except KeyError:
                 return JsonResponse(error_message)
 

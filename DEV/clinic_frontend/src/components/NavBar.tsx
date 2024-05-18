@@ -2,9 +2,9 @@ import { NavLink } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import { useNavigate } from "react-router-dom";
-import { getCookies, setCookie } from "../cookies";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
+import axios from "axios";
 
 const NavBar = () => {
     const navigate = useNavigate();
@@ -18,11 +18,11 @@ const NavBar = () => {
                 <Navbar.Brand onClick={() => navigate("/")}>
                     Fisioterapista.com
                 </Navbar.Brand>
-                {getCookies()["jwt"] && (
+                {localStorage.getItem("jwt") && (
                     <Navbar.Text>
                         Olá,{" "}
                         {
-                            (jwtDecode(getCookies()["jwt"]) as JwtPayload)
+                            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload)
                                 .username
                         }
                     </Navbar.Text>
@@ -33,32 +33,33 @@ const NavBar = () => {
                     id="basic-navbar-nav"
                     className="d-flex justify-content-end gap-3"
                 >
-                    {!getCookies()["jwt"] && (
+                    {!localStorage.getItem("jwt") && (
                         <NavLink onClick={() => navigate("/login")}>
                             Entrar
                         </NavLink>
                     )}
-                    {!getCookies()["jwt"] && (
+                    {!localStorage.getItem("jwt") && (
                         <NavLink onClick={() => navigate("/register")}>
                             Registar
                         </NavLink>
                     )}
-                    {getCookies()["jwt"] && (
+                    {localStorage.getItem("jwt") && (
                         <NavLink onClick={() => navigate("/scheduling")}>
                             Marcações
                         </NavLink>
                     )}
-                    {getCookies()["jwt"] &&
-                        (jwtDecode(getCookies()["jwt"]) as JwtPayload).role ===
+                    {localStorage.getItem("jwt") &&
+                        (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role ===
                             "admin" && (
                             <NavLink onClick={() => navigate("/admin")}>
                                 Administração
                             </NavLink>
                         )}
-                    {getCookies()["jwt"] && (
+                    {localStorage.getItem("jwt") && (
                         <NavLink
                             onClick={() => {
-                                setCookie("jwt", "");
+                                axios.defaults.headers.common['jwt'] = "";
+                                localStorage.removeItem("jwt");
                                 navigate("/");
                             }}
                         >

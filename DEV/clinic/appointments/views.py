@@ -1,21 +1,27 @@
 # pylint: disable=no-member
+import json
+import boto3
+import time
+
 from django.http import HttpRequest, JsonResponse
 from django.core.exceptions import FieldDoesNotExist
 
 from rest_framework.decorators import api_view
 from authentication.jwt import perm_required, validate_token, requires_jwt
 
-from .models import Appointment
+from .models import Consultas
 from .serializers import AppointmentSerializer
 
-import json
-import boto3
+MAX_RETRIES=3
+TIMEOUT=1
 
 
 @perm_required("admin")
 @api_view(["GET"])
 def all_appointments_view(_: HttpRequest) -> JsonResponse:
-    appointments = Appointment.objects.all()
+    # user = Consultas(1, "aa", 10, 1, "a", "as")
+    # user.save()
+    appointments = Consultas.objects.all()
 
     serializer = AppointmentSerializer(appointments, many=True)
 
@@ -26,7 +32,7 @@ def all_appointments_view(_: HttpRequest) -> JsonResponse:
 @api_view(["PUT"])
 def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
-    appointment = Appointment.objects.filter(id=_id)
+    appointment = Consultas.objects.filter(id=_id)
     if appointment is None:
         return JsonResponse({"error": "Appointment does not exist."})
 
@@ -64,7 +70,7 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
     except ValueError:
         return JsonResponse({"error": "Invalid payload."})
 
-    token = request.COOKIES["jwt"]
+    token = request.headers["jwt"]
     username = validate_token(token)["username"]
 
     try:
@@ -76,13 +82,30 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
                 "hora": hora,
                 "especialidade": especialidade,
                 "medico": medico,
+                "estado": "open"
             }
         )
         response = sf.start_execution(
             stateMachineArn="arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
             input=input_sf,
         )
+        execution_arn = response['executionArn']
+
+        for _ in range(MAX_RETRIES):
+            response = sf.describe_execution(
+                executionArn=execution_arn
+            )
+
+            status = response['status']
+
+            if status in ['SUCCEEDED', 'FAILED', 'TIMED_OUT', 'ABORTED']:
+                if status == 'FAILED':
+                    return JsonResponse({"message": response['error'], "statusCode": 500})
+                return JsonResponse({"message": "Insertion succeded", "statusCode": 200})
+
+            time.sleep(1)
+
+        return JsonResponse({"error": "Step function execution timed out."})
+
     except Exception as e:
         return JsonResponse({"error": str(e)})
-
-    return JsonResponse({"message": response})

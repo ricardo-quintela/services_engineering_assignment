@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
-from .models import Appointment
+from .models import Consultas
 
 class AppointmentSerializer(serializers.ModelSerializer):
     """Serializer for the Appointment model
@@ -9,5 +9,5 @@ class AppointmentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Appointment
-        fields = ["id", "user", "horario", "especialidade", "medico", "estado"]
+        model = Consultas
+        fields = ["user", "data_appointment", "hora", "especialidade", "medico", "estado"]

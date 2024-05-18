@@ -67,7 +67,7 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
     except ValueError:
         return JsonResponse({"error": "Invalid payload."})
 
-    token = request.COOKIES["jwt"]
+    token = request.headers["jwt"]
     username = validate_token(token)["username"]
 
     try:
@@ -87,19 +87,19 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             input=input_sf,
         )
         execution_arn = response['executionArn']
-        
+
         while True:
             response = sf.describe_execution(
                 executionArn=execution_arn
             )
-            
+
             status = response['status']
-            
+
             if status in ['SUCCEEDED', 'FAILED', 'TIMED_OUT', 'ABORTED']:
                 if status == 'FAILED':
                     return JsonResponse({"message": response['error'], "statusCode": 500})
                 return JsonResponse({"message": "Insertion succeded", "statusCode": 200})
-            
+
             time.sleep(0.5)
     except Exception as e:
         return JsonResponse({"error": str(e)})

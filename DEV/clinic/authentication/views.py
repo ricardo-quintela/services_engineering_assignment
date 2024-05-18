@@ -101,7 +101,7 @@ def login_view(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"error": "Invalid password."})
 
     response = JsonResponse({"message": "Successfully logged in."})
-    response["jwt"] = generate_token(user)
+    response.headers["jwt"] = generate_token(user)
 
     return response
 
@@ -110,7 +110,7 @@ def login_view(request: HttpRequest) -> JsonResponse:
 @api_view(["POST"])
 def upload_image_view(request: HttpRequest) -> JsonResponse:
 
-    jwt_payload = verify_format(validate_token(request.COOKIES["jwt"]))
+    jwt_payload = verify_format(validate_token(request["jwt"]))
     username = jwt_payload.username
 
     try:

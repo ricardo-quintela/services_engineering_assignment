@@ -34,8 +34,7 @@ class TestAppointments(BaseTestCase):
 
     def test_get_appointments(self):
         """Tests if an admin can get all the appointments"""
-        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
-        response = self.client.get("/appointments/")
+        response = self.client.get("/appointments/", headers={"jwt": generate_token(self.admins[0])})
 
         self.assertJSONEqual(
             response.content,
@@ -54,15 +53,13 @@ class TestAppointments(BaseTestCase):
 
     def test_get_appointments_not_admin(self):
         """Tests if a regular user is blocked from accessing the appointments data"""
-        self.client.cookies.load({"jwt": generate_token(self.users[0])})
-        response = self.client.get("/appointments/")
+        response = self.client.get("/appointments/", headers={"jwt": generate_token(self.users[0])})
 
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
 
     def test_close_appointment(self):
         """Tests if an admin can alter an appointment's field"""
-        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
-        response = self.client.put("/appointments/1/", data={"estado": "closed"})
+        response = self.client.put("/appointments/1/", data={"estado": "closed"}, headers={"jwt": generate_token(self.admins[0])})
 
         self.assertJSONEqual(
             response.content,
@@ -78,10 +75,10 @@ class TestAppointments(BaseTestCase):
 
     def test_close_appointment_wrong_attribute(self):
         """Tests if the attribute's name is not changed if the name is incorrect"""
-        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
         response = self.client.put(
             "/appointments/1/",
             data={"unexistent_attribute": "value"},
+            headers={"jwt": generate_token(self.admins[0])}
         )
 
         self.assertJSONEqual(
@@ -91,10 +88,10 @@ class TestAppointments(BaseTestCase):
 
     def test_close_appointment_not_admin(self):
         """Tests if a regular user is blocked from accessing the appointments data"""
-        self.client.cookies.load({"jwt": generate_token(self.users[0])})
         response = self.client.put(
             "/appointments/1/",
             data={"estado": "closed"},
+            headers={"jwt": generate_token(self.users[0])}
         )
 
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
@@ -102,8 +99,6 @@ class TestAppointments(BaseTestCase):
 
     def test_scheduling(self):
         """Tests if a regular user can schedule an appointment"""
-        self.client.cookies.load({"jwt": generate_token(self.users[0])})
-
         response = self.client.post(
             "/scheduling/",
             data={
@@ -111,14 +106,13 @@ class TestAppointments(BaseTestCase):
                 "horario": 12,
                 "especialidade": 2,
                 "medico": "doctor"
-            }
+            },
+            headers={"jwt": generate_token(self.users[0])}
         )
         self.assertTrue("message" in json.loads(response.content))
 
     def test_scheduling_not_authenticated(self):
         """Tests if a regular user that is not logged in cannot schedule an appointment"""
-        self.client.cookies.load({"jwt": INVALID_TOKEN})
-
         response = self.client.post(
             "/scheduling/",
             data={
@@ -126,7 +120,8 @@ class TestAppointments(BaseTestCase):
                 "horario": 12,
                 "especialidade": 2,
                 "medico": "doctor"
-            }
+            },
+            headers={"jwt": INVALID_TOKEN}
         )
         self.assertJSONEqual(
             response.content,
@@ -135,15 +130,14 @@ class TestAppointments(BaseTestCase):
 
     def test_scheduling_invalid_payload(self):
         """Tests if an invalid payload is blocked"""
-        self.client.cookies.load({"jwt": generate_token(self.users[0])})
-
         response = self.client.post(
             "/scheduling/",
             data={
                 "horario": 12,
                 "especialidade": 2,
                 "medico": "doctor"
-            }
+            },
+            headers={"jwt": generate_token(self.users[0])}
         )
         self.assertJSONEqual(
             response.content,

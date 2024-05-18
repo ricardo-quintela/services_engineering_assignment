@@ -38,8 +38,7 @@ function SchedullingForm() {
                 data: payload.inputData.value,
                 hora: payload.inputHora.value,
                 especialidade: payload.inputEspecialidade.value,
-                medico: imagemAtual,
-                jwt: document.cookie.split("=")[1].trim()
+                medico: imagemAtual
             }
             ).then((response) => {
                 console.log(response);

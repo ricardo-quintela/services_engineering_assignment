@@ -7,22 +7,19 @@ class TestLoginEndpoints(BaseTestCase):
 
     def test_get_all_users_not_authenticated(self):
         """Tests if a random user in the database can be returned"""
-        self.client.cookies.load({"jwt": INVALID_TOKEN})
-        response = self.client.get("/users/")
+        response = self.client.get("/users/", headers={"jwt": INVALID_TOKEN})
         self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_get_invalid_user(self):
         """Tests if getting an invalid user will return an error message"""
         user_id = len(self.users) + len(self.admins) + 1
-        self.client.cookies.load({"jwt": generate_token(self.admins[0])})
-        response = self.client.get(f"/users/{user_id}/")
+        response = self.client.get(f"/users/{user_id}/", headers={"jwt": generate_token(self.admins[0])})
         self.assertJSONEqual(response.content, {"error": "User does not exist."})
 
     def test_get_invalid_user_not_authenticated(self):
         """Tests if getting an invalid user will return an error message"""
         user_id = len(self.users) + len(self.admins) + 1
-        self.client.cookies.load({"jwt": INVALID_TOKEN})
-        response = self.client.get(f"/users/{user_id}/")
+        response = self.client.get(f"/users/{user_id}/", headers={"jwt": INVALID_TOKEN})
         self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_login_valid_credentials(self):

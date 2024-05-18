@@ -9,3 +9,7 @@
 
 # Postgres
 .*pgpass
+
+# testes
+ronaldo.jpg
+test_json_image.json

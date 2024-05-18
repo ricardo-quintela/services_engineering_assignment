@@ -6,10 +6,34 @@ services:
       context: clinic/
     ports:
       - "8000:8000"
+    depends_on:
+      - backend_db
+    networks:
+      - aws
+
+  backend_db:
+    image: postgres:16.3
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: rds.clinic
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - aws
 
   frontend_s3:
     image: "adobe/s3mock:latest"
     environment:
-      - initialBuckets=frontend
+      - initialBuckets=frontend.clinic, image.clinic
     ports:
       - "9090:9090"
+    networks:
+      aws:
+        aliases:
+          - s3
+
+networks:
+  aws:

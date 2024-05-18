@@ -49,7 +49,7 @@ const NavBar = () => {
                         </NavLink>
                     )}
                     {getCookies()["jwt"] &&
-                        (jwtDecode(getCookies()["jwt"]) as JwtPayload).role ==
+                        (jwtDecode(getCookies()["jwt"]) as JwtPayload).role ===
                             "admin" && (
                             <NavLink onClick={() => navigate("/admin")}>
                                 Administração

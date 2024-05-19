@@ -28,8 +28,8 @@ class TestS3Uploads(BaseTestCase):
     @patch("aws_middleware.stepfunctions.client.describe_execution")
     def test_execute_workflow(self, mock_boto_client, mock_describer):
         """Tests if a workflow can be executed"""
-        mock_boto_client.return_value = boto3.client("stepfunctions")
-        mock_describer.return_value = {"status": "SUCCEEDED"}
+        mock_boto_client.return_value = boto3.client("stepfunctions", region_name="us-east-1")
+        mock_describer.return_value = {"status": "SUCCEEDED", "output": "workflow output"}
 
         self.assertTrue(
             execute_workflow(

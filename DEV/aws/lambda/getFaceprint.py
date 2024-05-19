@@ -1,4 +1,3 @@
-import base64
 import json
 import boto3
 
@@ -8,12 +7,11 @@ clientRekognition = boto3.client("rekognition")
 def lambda_handler(event, context):
 
     bucket_image = event["imageKey"]
-    source_image = base64.b85decode(event["imageBytes"])
     bucket_name = event["bucketName"]
 
     try:
         response = clientRekognition.compare_faces(
-            SourceImage={"Bytes": source_image},
+            SourceImage={"S3Object": {"Bucket": bucket_name, "Name": bucket_image}},
             TargetImage={"S3Object": {"Bucket": bucket_name, "Name": bucket_image}},
             SimilarityThreshold=90,
         )

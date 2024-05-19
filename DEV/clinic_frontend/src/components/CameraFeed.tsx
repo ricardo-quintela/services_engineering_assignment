@@ -17,29 +17,7 @@ const CameraFeed = ({
     addNotification: (notificationData: NotificationData) => void;
     uploadTo: string;
 }) => {
-    const videoRef = useRef<any>(null);
-    const photoRef = useRef<any>(null);
-
-    const [deviceFound, setDeviceFound] = useState(true);
-    const [hasPhoto, setHasPhoto] = useState(false);
     const [files, setFiles] = useState<FileList | null>(null);
-
-    const getVideo = () => {
-        navigator.mediaDevices
-            .getUserMedia({ video: { width: 1920, height: 1080 } })
-            .then((stream) => {
-                if (videoRef.current === null) return;
-
-                let video = videoRef.current;
-                video.srcObject = stream;
-                video.play();
-            })
-            .catch(() => setDeviceFound(false));
-    };
-
-    useEffect(() => {
-        getVideo();
-    }, [videoRef]);
 
     const fileSelectedHandler = (event: ChangeEvent<HTMLInputElement>) => {
         setFiles(event.target.files);
@@ -82,21 +60,6 @@ const CameraFeed = ({
     return (
         <Container className="border p-3">
             <h2>Carregar Imagem</h2>
-            {deviceFound && (
-                <>
-                    <Container>
-                        <video ref={videoRef} />
-                        <Button>SNAP</Button>
-                    </Container>
-                    <Container
-                        className={"result" + (hasPhoto ? "-photo" : "")}
-                    >
-                        <canvas ref={photoRef} />
-                        <Button>Close</Button>
-                    </Container>
-                    <p>OU</p>
-                </>
-            )}
 
             <Form
                 onSubmit={handleSubmit}

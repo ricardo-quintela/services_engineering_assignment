@@ -29,7 +29,7 @@ DEBUG = True
 EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
 STEP_FUNCTION = os.environ.get("STEP_FUNCTION", "172.31.43.159")
 
-S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") 
+S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", None) 
 S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")

@@ -1,11 +1,12 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
-import { Badge, Button } from "react-bootstrap";
+import { Badge, Button, Container } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 import { NotificationData } from "../interfaces/notification";
 import ListGroup from "react-bootstrap/ListGroup";
 import { AppointmentData } from "../interfaces/appointment";
+import CameraFeed from "./CameraFeed";
 
 axios.defaults.withCredentials = true;
 
@@ -17,8 +18,9 @@ const AdminDashboard = ({
 	const [appointmentData, setAppointmentData] = useState(
 		[] as AppointmentData[]
 	);
+	const [ranQuery, setRanQuery] = useState(false);
 
-	if (appointmentData.length === 0) {
+	if (!ranQuery) {
 		axios
 			.get(process.env.REACT_APP_API_URL + "appointments/")
 			.then((response) => {
@@ -31,6 +33,7 @@ const AdminDashboard = ({
 				}
 
 				setAppointmentData(response.data);
+				setRanQuery(true);
 			})
 			.catch(() =>
 				addNotification({
@@ -120,18 +123,11 @@ const AdminDashboard = ({
 				</ListGroup>
 			</div>
 
-			<div className="d-flex gap-3 flex-sm-row flex-column flex-wrap w-50">
-				<Card style={{ width: "18rem" }}>
-					<Card.Body>
-						<Card.Title>Reconhecimento Facial</Card.Title>
-						<Card.Text>
-							Verificar a consulta de um cliente através de
-							software de reconhecimento facial.
-						</Card.Text>
-						<Button variant="primary">Ir</Button>
-					</Card.Body>
-				</Card>
-			</div>
+			<Container>
+				<h1>Reconhecimento facial de cliente</h1>
+				<CameraFeed addNotification={addNotification} uploadTo="recognition/"/>
+
+			</Container>
 		</div>
 	);
 };

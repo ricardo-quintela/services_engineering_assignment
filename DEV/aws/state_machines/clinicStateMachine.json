@@ -1,67 +1,138 @@
 {
-    "Comment": "Esta máquina de estados faz reconhecimento facial a partir de um input simples",
-    "StartAt": "Validar Input",
-    "States": {
-      "Validar Input": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "And": [
-              {
-                "Variable": "$.imageKey",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.imageKey",
-                "IsString": true
-              },
-              {
-                "Variable": "$.bucketName",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.bucketName",
-                "IsString": true
-              },
-              {
-                "Variable": "$.imageBytes",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.imageBytes",
-                "IsString": true
-              }
-            ],
-            "Next": "Fazer Reconhecimento Facial"
-          }
-        ],
-        "Default": "Success"
-      },
-      "Fazer Reconhecimento Facial": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "OutputPath": "$.Payload",
-        "Parameters": {
-          "Payload.$": "$",
-          "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST"
+  "Comment": "Escolhe entre obter um faceprint ou fazer reconhecimento facial",
+  "StartAt": "Escolher Funcionalidade",
+  "States": {
+    "Escolher Funcionalidade": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.type",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.type",
+              "StringEquals": "facialRecognition"
+            }
+          ],
+          "Next": "Validar Input"
         },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Success"
+        {
+          "And": [
+            {
+              "Variable": "$.type",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.type",
+              "StringEquals": "$.getFaceprint"
+            }
+          ],
+          "Next": "Choice"
+        }
+      ],
+      "Default": "Success"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.arguments.username",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.username",
+              "IsString": true
+            }
+          ],
+          "Next": "Obter Impressão Facial"
+        }
+      ],
+      "Default": "Success"
+    },
+    "Obter Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST",
+        "Payload": {
+          "username": "$.arguments.username"
+        }
       },
-      "Success": {
-        "Type": "Succeed"
-      }
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Success"
+    },
+    "Validar Input": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.arguments.imageKey",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.imageKey",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsString": true
+            }
+          ],
+          "Next": "Fazer Reconhecimento Facial"
+        }
+      ],
+      "Default": "Success"
+    },
+    "Fazer Reconhecimento Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST",
+        "Payload": {
+          "imageKey": "$.arguments.imageKey",
+          "bucketName": "$.arguments.bucketName"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
     }
   }
+}

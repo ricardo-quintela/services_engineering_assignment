@@ -1,16 +1,13 @@
 # pylint: disable=no-member
-import time
 from django.http import HttpRequest, JsonResponse
 from django.core.exceptions import FieldDoesNotExist
 
 from rest_framework.decorators import api_view
 from authentication.jwt import perm_required, validate_token, requires_jwt
+from aws_middleware.stepfunctions import execute_workflow
 
 from .models import Consultas
 from .serializers import AppointmentSerializer
-
-import json
-import boto3
 
 
 @perm_required("admin")
@@ -69,36 +66,14 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
     token = request.headers["jwt"]
     username = validate_token(token)["username"]
 
-    try:
-        sf = boto3.client("stepfunctions", region_name="us-east-1")
-        input_sf = json.dumps(
-            {
-                "cliente": username,
-                "data": data,
-                "hora": hora,
-                "especialidade": especialidade,
-                "medico": medico,
-                "estado": "open"
-            }
-        )
-        response = sf.start_execution(
-            stateMachineArn="arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
-            input=input_sf,
-        )
-        execution_arn = response['executionArn']
-
-        while True:
-            response = sf.describe_execution(
-                executionArn=execution_arn
-            )
-
-            status = response['status']
-
-            if status in ['SUCCEEDED', 'FAILED', 'TIMED_OUT', 'ABORTED']:
-                if status == 'FAILED':
-                    return JsonResponse({"message": response['error'], "statusCode": 500})
-                return JsonResponse({"message": "Insertion succeded", "statusCode": 200})
-
-            time.sleep(0.5)
-    except Exception as e:
-        return JsonResponse({"error": str(e)})
+    return execute_workflow(
+        {
+            "cliente": username,
+            "data": data,
+            "hora": hora,
+            "especialidade": especialidade,
+            "medico": medico,
+            "estado": "open",
+        },
+        "arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
+    )

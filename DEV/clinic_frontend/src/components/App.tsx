@@ -12,6 +12,9 @@ import { getCookies } from "../cookies";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
 import LandingPage from "./LandingPage";
+import CameraFeed from "./CameraFeed";
+import axios from "axios";
+import Profile from "./Profile";
 
 const App = () => {
     const addNotification = (notificationData: NotificationData) =>
@@ -24,11 +27,17 @@ const App = () => {
         [] as NotificationData[]
     );
 
+    // restore token
+    if (localStorage.getItem("jwt") !== null) {
+        axios.defaults.headers.common["jwt"] = localStorage.getItem("jwt");
+    }
+
     const checkAdmin = () =>
         (localStorage.getItem("jwt") &&
-            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role) === "admin";
+            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload)
+                .role) === "admin";
 
-	const checkLogin = () => localStorage.getItem("jwt") !== "";
+    const checkLogin = () => localStorage.getItem("jwt") !== "";
 
     return (
         <>
@@ -40,6 +49,25 @@ const App = () => {
                 <section className="h-75">
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute
+                                    condition={checkLogin}
+                                    redirectTo="/"
+                                    addNotification={addNotification}
+                                    notificationData={{
+                                        title: "Acesso Negado",
+                                        message:
+                                            "Precisa de fazer login para aceder a este recurso.",
+                                    }}
+                                >
+                                    <Profile
+                                        addNotification={addNotification}
+                                    />
+                                </ProtectedRoute>
+                            }
+                        />
                         <Route
                             path="/scheduling"
                             element={

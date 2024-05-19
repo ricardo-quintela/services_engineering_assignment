@@ -17,7 +17,7 @@ def s3_upload(image_key: str, image_file: bytes, bucket_name: str) -> bool:
     """
     try:
         client.upload_fileobj(image_file, bucket_name, image_key)
-    except ClientError:
-        return False
+    except ClientError as e:
+        return str(e)
 
     return True

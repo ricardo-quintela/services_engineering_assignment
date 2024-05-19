@@ -110,7 +110,10 @@ class TestAppointments(BaseTestCase):
     @patch("aws_middleware.stepfunctions.client.describe_execution")
     def test_scheduling(self, mock_describer):
         """Tests if a regular user can schedule an appointment"""
-        mock_describer.return_value = {"status": "SUCCEEDED"}
+        mock_describer.return_value = {
+            "status": "SUCCEEDED",
+            "output": '{"output": "function output"}',
+        }
 
         response = self.client.post(
             "/scheduling/",

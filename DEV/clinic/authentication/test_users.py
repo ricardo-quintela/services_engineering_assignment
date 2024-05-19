@@ -17,7 +17,9 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user(self):
         """Tests if a random user in the database can be returned"""
         user_id = randint(1, len(self.users))
-        response = self.client.get(f"/users/{user_id}/", headers={"jwt": generate_token(self.admins[0])})
+        response = self.client.get(
+            f"/users/{user_id}/", headers={"jwt": generate_token(self.admins[0])}
+        )
         self.assertJSONEqual(
             response.content, {"id": user_id, "username": f"test_user{user_id}"}
         )
@@ -31,12 +33,16 @@ class TestUserEndPoints(BaseTestCase):
     def test_get_user_not_admin(self):
         """Tests if a random user in the database can be returned"""
         user_id = randint(1, len(self.users))
-        response = self.client.get(f"/users/{user_id}/", headers={"jwt": generate_token(self.users[0])})
+        response = self.client.get(
+            f"/users/{user_id}/", headers={"jwt": generate_token(self.users[0])}
+        )
         self.assertJSONEqual(response.content, {"error": "Forbidden."})
 
     def test_get_all_users(self):
         """Tests if all the users in the database are returned"""
-        response = self.client.get("/users/", headers={"jwt": generate_token(self.admins[0])})
+        response = self.client.get(
+            "/users/", headers={"jwt": generate_token(self.admins[0])}
+        )
         self.assertJSONEqual(
             response.content,
             [
@@ -47,46 +53,50 @@ class TestUserEndPoints(BaseTestCase):
 
     @patch("aws_middleware.s3.client")
     def test_upload_file(self, mock_boto_client):
-        """Tests if an authenticated user can upload a profile picture
-        """
+        """Tests if an authenticated user can upload a profile picture"""
         mock_boto_client.return_value = boto3.client("s3")
 
-        image = SimpleUploadedFile("profile.jpg", b"image_content", content_type="image/jpeg")
-        response = self.client.post("/image/", {"file": image}, headers={"jwt": generate_token(self.users[0])})
+        image = SimpleUploadedFile(
+            "profile.jpg", b"image_content", content_type="image/jpeg"
+        )
+        response = self.client.post(
+            "/image/", {"file": image}, headers={"jwt": generate_token(self.users[0])}
+        )
 
         self.assertJSONEqual(
-            response.content,
-            {"message": "Image successfully uploaded."}
+            response.content, {"message": "Image successfully uploaded."}
         )
 
     def test_upload_file_not_authenticated(self):
-        """Tests if a non authenticated user is stopped from uploading a file
-        """
-        image = SimpleUploadedFile("profile.jpg", b"image_content", content_type="image/jpeg")
-        response = self.client.post("/image/", {"file": image}, headers={"jwt": INVALID_TOKEN})
-
-        self.assertJSONEqual(
-            response.content,
-            {"error": "User is not logged in."}
+        """Tests if a non authenticated user is stopped from uploading a file"""
+        image = SimpleUploadedFile(
+            "profile.jpg", b"image_content", content_type="image/jpeg"
         )
+        response = self.client.post(
+            "/image/", {"file": image}, headers={"jwt": INVALID_TOKEN}
+        )
+
+        self.assertJSONEqual(response.content, {"error": "User is not logged in."})
 
     def test_upload_file_not_supplied(self):
-        """Stops a request that doesn't contain a file
-        """
-        response = self.client.post("/image/", headers={"jwt": generate_token(self.users[0])})
-
-        self.assertJSONEqual(
-            response.content,
-            {"error": "No image was uploaded."}
+        """Stops a request that doesn't contain a file"""
+        response = self.client.post(
+            "/image/", headers={"jwt": generate_token(self.users[0])}
         )
 
+        self.assertJSONEqual(response.content, {"error": "No image was uploaded."})
+
     def test_upload_file_too_big(self):
-        """Stops a request that doesn't contain a file
-        """
-        image = SimpleUploadedFile("profile.jpg", b"a"*(MAX_FILE_SIZE+1), content_type="image/jpeg")
-        response = self.client.post("/image/", data={"file": image}, headers={"jwt": generate_token(self.users[0])})
+        """Stops a request that doesn't contain a file"""
+        image = SimpleUploadedFile(
+            "profile.jpg", b"a" * (MAX_FILE_SIZE + 1), content_type="image/jpeg"
+        )
+        response = self.client.post(
+            "/image/",
+            data={"file": image},
+            headers={"jwt": generate_token(self.users[0])},
+        )
 
         self.assertJSONEqual(
-            response.content,
-            {"error": "Uploaded file excedes max size limit."}
+            response.content, {"error": "Uploaded file excedes max size limit."}
         )

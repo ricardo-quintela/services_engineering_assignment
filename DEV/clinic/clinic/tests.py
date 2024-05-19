@@ -52,6 +52,18 @@ class BaseTestCase(TestCase):
             definition=definition,
         )
 
+        with open(
+            "../aws/state_machines/clinicStateMachine.json",
+            "r",
+            encoding="utf-8",
+        ) as f:
+            definition = f.read()
+        step_function.create_state_machine(
+            name="clinicStateMachine",
+            roleArn="arn:aws:iam::123456789012:role/unknown_sf_role",
+            definition=definition,
+        )
+
     def tearDown(self) -> None:
         self.mock_aws.stop()
         super().tearDown()

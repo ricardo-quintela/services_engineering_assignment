@@ -3,6 +3,7 @@ import { NotificationData } from "../interfaces/notification";
 import CameraFeed from "./CameraFeed";
 import { JwtPayload } from "../interfaces/jwt";
 import { Container } from "react-bootstrap";
+import { AxiosResponse } from "axios";
 
 const Profile = ({
     addNotification,
@@ -18,7 +19,19 @@ const Profile = ({
                         .username
                 }
             </h1>
-            <CameraFeed addNotification={addNotification} uploadTo="image/" />
+            <CameraFeed
+                addNotification={addNotification}
+                uploadTo="image/"
+                successHandler={(response: AxiosResponse) =>
+                    addNotification({
+                        title: "message" in response.data ? "Success" : "Error",
+                        message:
+                            "message" in response.data
+                                ? response.data["message"]
+                                : response.data["error"],
+                    })
+                }
+            />
         </Container>
     );
 };

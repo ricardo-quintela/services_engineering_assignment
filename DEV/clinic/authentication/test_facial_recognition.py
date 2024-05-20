@@ -1,4 +1,3 @@
-import json
 from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,7 +13,7 @@ class TestFacialRecognition(BaseTestCase):
         """Tests if an admin can run a facial recognition workflow"""
         mock_describer.return_value = {
             "status": "SUCCEEDED",
-            "output": '{\n  "comparison_result": 99.95706176757812\n}',
+            "output": '"{\\"comparison_result\\": 100}"',
         }
 
         image = SimpleUploadedFile(
@@ -25,4 +24,6 @@ class TestFacialRecognition(BaseTestCase):
             data={"file": image, "username": self.users[0].username},
             headers={"jwt": generate_token(self.admins[0])},
         )
-        self.assertTrue("message" in json.loads(response.content))
+        self.assertJSONEqual(
+            response.content, {"message": {"comparison_result": 100}, "statusCode": 200}
+        )

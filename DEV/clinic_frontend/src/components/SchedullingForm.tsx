@@ -2,12 +2,11 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Carousel } from "react-bootstrap";
 import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import atanagildoImagem from "../img/atanagildo.jpg";
 import manuelaImagem from "../img/manuela.jpg";
 import semPreferenciaImagem from "../img/sem_preferencia.png";
-import { NotificationData } from "../interfaces/notification";
-import { getCookies, setCookie } from "../cookies";
 
 axios.defaults.withCredentials = true;
 
@@ -23,6 +22,8 @@ function SchedullingForm() {
             setImagemAtual("Mulher");
         }
     };
+
+    const navigate = useNavigate();
 
     // Preenchemos o formulário e enviamos ao endpoint
     const handleSumbmit = (e: FormEvent) => {
@@ -41,7 +42,9 @@ function SchedullingForm() {
                 medico: imagemAtual
             }
             ).then((response) => {
-                console.log(response);
+                if ("message" in response.data){
+                    navigate("/");
+                }
             })
             .catch((response) => console.log(response));
     };

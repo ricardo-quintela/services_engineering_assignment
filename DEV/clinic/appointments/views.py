@@ -5,6 +5,7 @@ from django.core.exceptions import FieldDoesNotExist
 
 from rest_framework.decorators import api_view
 from authentication.jwt import perm_required, validate_token, requires_jwt
+from django.contrib.auth.models import User
 
 from .models import Consultas
 from .serializers import AppointmentSerializer
@@ -18,6 +19,19 @@ import boto3
 def all_appointments_view(_: HttpRequest) -> JsonResponse:
 
     appointments = Consultas.objects.all()
+
+    serializer = AppointmentSerializer(appointments, many=True)
+
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(["GET"])
+def all_appointments_view_id(request: HttpRequest) -> JsonResponse:
+    
+    token = request.headers["jwt"]
+    username = validate_token(token)["username"]
+    user_id = User.objects.filter(username=username).values()[0]["id"]
+    
+    appointments = Consultas.objects.filter(user=user_id)
 
     serializer = AppointmentSerializer(appointments, many=True)
 

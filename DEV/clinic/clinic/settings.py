@@ -29,14 +29,14 @@ DEBUG = True
 EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
 STEP_FUNCTION = os.environ.get("STEP_FUNCTION", "172.31.43.159")
 
-S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", "http://localhost:3000") 
+S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", None) 
 S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
 
 # RDS
-RDS_NAME = os.environ.get("RDS_NAME", "Consultas")
-RDS_HOST = os.environ.get("RDS_HOST", "clinic.chmlmnyewbda.us-east-1.rds.amazonaws.com")
+RDS_NAME = os.environ.get("RDS_NAME", "rds.clinic")
+RDS_HOST = os.environ.get("RDS_HOST", "localhost")
 RDS_PORT = os.environ.get("RDS_PORT", "5432")
 RDS_USER = os.environ.get("RDS_USER", "postgres")
 RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")

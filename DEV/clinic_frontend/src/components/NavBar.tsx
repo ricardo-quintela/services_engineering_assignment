@@ -19,7 +19,7 @@ const NavBar = () => {
                     Fisioterapista.com
                 </Navbar.Brand>
                 {localStorage.getItem("jwt") && (
-                    <Navbar.Text>
+                    <Navbar.Text onClick={() => navigate("/profile")}>
                         Olá,{" "}
                         {
                             (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload)
@@ -31,7 +31,7 @@ const NavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse
                     id="basic-navbar-nav"
-                    className="d-flex justify-content-end gap-3"
+                    className="justify-content-end gap-3"
                 >
                     {!localStorage.getItem("jwt") && (
                         <NavLink onClick={() => navigate("/login")}>

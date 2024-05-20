@@ -124,7 +124,7 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
     if image.size > MAX_FILE_SIZE:
         return JsonResponse({"error": "Uploaded file excedes max size limit."})
 
-    if status := s3_upload(image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image) != True:
+    if (status := s3_upload(image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image)) != True:
         return JsonResponse({"error": f"An error occured while uploading the image: {status}"})
 
     return JsonResponse({"message": "Image successfully uploaded."})

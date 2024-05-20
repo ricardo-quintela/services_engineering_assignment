@@ -1,21 +1,31 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import {
     ChangeEvent,
     FormEvent,
+    ReactElement,
     createRef,
     useEffect,
     useRef,
     useState,
 } from "react";
-import { Button, Container, Form } from "react-bootstrap";
+import { Container, Form } from "react-bootstrap";
 import { NotificationData } from "../interfaces/notification";
+import { JsxElement } from "typescript";
+import { access } from "fs";
 
 const CameraFeed = ({
     addNotification,
-    uploadTo
+    uploadTo,
+    successHandler,
+    aditionalFormInputs = [],
 }: {
     addNotification: (notificationData: NotificationData) => void;
     uploadTo: string;
+    successHandler: (response: AxiosResponse) => void;
+    aditionalFormInputs?: {
+        inputLabel: string;
+        inputField: ReactElement;
+    }[];
 }) => {
     const [files, setFiles] = useState<FileList | null>(null);
 
@@ -25,6 +35,7 @@ const CameraFeed = ({
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
+
 
         if (files === null) {
             addNotification({
@@ -37,22 +48,20 @@ const CameraFeed = ({
         const formData = new FormData();
         formData.append("file", files[0], files[0].name);
 
+        Array.from(
+            e.currentTarget.children[0].children
+        )
+            .filter((_, index) => index % 2 === 1)
+            .map((element) => element as HTMLInputElement)
+            .forEach(element => formData.append(element.id, element.value));
+
         axios
             .post(process.env.REACT_APP_API_URL + uploadTo, formData)
-            .then((response) => {
-                addNotification({
-                    title: "message" in response.data ? "Success" : "Error",
-                    message:
-                        "message" in response.data
-                            ? response.data["message"]
-                            : response.data["error"],
-                });
-
-            })
+            .then((response) => successHandler(response))
             .catch(() => {
                 addNotification({
                     title: "Error",
-                    message: "An error has occured while attempting to login.",
+                    message: "An error has occured.",
                 });
             });
     };
@@ -64,7 +73,23 @@ const CameraFeed = ({
             <Form
                 onSubmit={handleSubmit}
                 className="d-flex flex-column align-items-center gap-3"
+                id="ikd-man"
             >
+                {aditionalFormInputs.length > 0 && (
+                    <Container className="d-flex flex-column">
+                        {aditionalFormInputs.map((input) => (
+                            <>
+                                <Form.Label
+                                    htmlFor={input.inputField.props["id"]}
+                                >
+                                    {input.inputLabel}
+                                </Form.Label>
+                                {input.inputField}
+                            </>
+                        ))}
+                    </Container>
+                )}
+
                 <Container>
                     <Form.Label htmlFor="selectImage">Imagem</Form.Label>
                     <Form.Control

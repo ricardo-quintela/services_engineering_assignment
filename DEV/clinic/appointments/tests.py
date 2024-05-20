@@ -112,7 +112,7 @@ class TestAppointments(BaseTestCase):
         """Tests if a regular user can schedule an appointment"""
         mock_describer.return_value = {
             "status": "SUCCEEDED",
-            "output": '{"output": "function output"}',
+            "output": '"\\"function output\\""',
         }
 
         response = self.client.post(

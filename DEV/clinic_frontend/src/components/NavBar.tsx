@@ -55,6 +55,13 @@ const NavBar = () => {
                                 Administração
                             </NavLink>
                         )}
+                    {localStorage.getItem("jwt") &&
+                        (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role ===
+                            null && (
+                            <NavLink onClick={() => navigate("/list_appointements")}>
+                                Consultas
+                            </NavLink>
+                        )}
                     {localStorage.getItem("jwt") && (
                         <NavLink
                             onClick={() => {

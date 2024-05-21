@@ -63,6 +63,7 @@ def main():
             print(f"Uploading: {os.path.join(root, file)}")
             if "\\" in file_path:
                 file_key = file_path.removeprefix(os.path.dirname(build_directory) + "\\")
+                file_key = file_key.replace("\\", "/")
             else:
                 file_key = file_path.removeprefix(os.path.dirname(build_directory) + "/")
             s3.upload_file(

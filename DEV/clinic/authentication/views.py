@@ -1,7 +1,8 @@
 # pylint: disable=no-member
 """Contains the API endpoints used for authentication and related
 """
-import base64
+import json
+import uuid
 
 from django.contrib.auth.models import User
 from django.http import HttpRequest, JsonResponse
@@ -11,11 +12,21 @@ from rest_framework.decorators import api_view
 
 from aws_middleware.s3 import s3_upload
 from aws_middleware.stepfunctions import execute_workflow
-from clinic.settings import MAX_FILE_SIZE, S3_IMAGE_BUCKET_NAME
+from clinic.settings import (
+    MAX_FILE_SIZE,
+    REKOGNITION_COLLECTION_ID,
+    S3_IMAGE_BUCKET_NAME,
+    STATE_MACHINE_ARN,
+)
 
 from .serializers import UserSerializer
-from .jwt import generate_token, perm_required, requires_jwt, validate_token, verify_format
-
+from .jwt import (
+    generate_token,
+    perm_required,
+    requires_jwt,
+    validate_token,
+    verify_format,
+)
 
 
 @perm_required("admin")
@@ -81,6 +92,7 @@ def register_view(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse({"message": "Successfully registered."})
 
+
 @api_view(["POST"])
 def login_view(request: HttpRequest) -> JsonResponse:
     """Logs a user in and returns a valid JWT the response's headers
@@ -124,10 +136,33 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
     if image.size > MAX_FILE_SIZE:
         return JsonResponse({"error": "Uploaded file excedes max size limit."})
 
-    if (status := s3_upload(image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image)) != True:
-        return JsonResponse({"error": f"An error occured while uploading the image: {status}"})
+    if (
+        status := s3_upload(
+            image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image
+        )
+    ) != True:
+        return JsonResponse(
+            {"error": f"An error occured while uploading the image: {status}"}
+        )
 
-    return JsonResponse({"message": "Image successfully uploaded."})
+    response = execute_workflow(
+        {
+            "type": "getFacePrint",
+            "arguments": {
+                "username": username,
+                "bucketName": S3_IMAGE_BUCKET_NAME,
+                "collectionId": REKOGNITION_COLLECTION_ID,
+            },
+        },
+        STATE_MACHINE_ARN
+    )
+
+    if json.loads(response.content)["statusCode"] == 200:
+        return JsonResponse({"message": "Image successfully uploaded."})
+
+    return JsonResponse(
+        {"error": f"An error occured while uploading the image: {json.loads(response.content)['error']}"}
+    )
 
 
 @perm_required("admin")
@@ -141,12 +176,6 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
     Returns:
         JsonResponse: the response data with the possible output of the workflow
     """
-
-    try:
-        username = request.data.get("username")
-    except KeyError:
-        return JsonResponse({"error": "Username not supplied."})
-
     try:
         image = request.FILES["file"]
     except KeyError:
@@ -155,10 +184,25 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
     if image.size > MAX_FILE_SIZE:
         return JsonResponse({"error": "Uploaded file excedes max size limit."})
 
-    enconded_image = base64.b85encode(image.read()).decode("utf-8")
+    image_uuid = str(uuid.uuid4())
 
-    return execute_workflow({
-        "imageKey": username,
-        "bucketName": S3_IMAGE_BUCKET_NAME,
-        "imageBytes": enconded_image
-    }, "arn:aws:states:us-east-1:123456789012:stateMachine:clinicStateMachine")
+    if (
+        status := s3_upload(
+            image_key=image_uuid, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image
+        )
+    ) != True:
+        return JsonResponse(
+            {"error": f"An error occured while uploading the image: {status}"}
+        )
+
+    return execute_workflow(
+        {
+            "type": "facialRecognition",
+            "arguments": {
+                "imageUUID": image_uuid,
+                "bucketName": S3_IMAGE_BUCKET_NAME,
+                "collectionId": REKOGNITION_COLLECTION_ID,
+            },
+        },
+        STATE_MACHINE_ARN,
+    )

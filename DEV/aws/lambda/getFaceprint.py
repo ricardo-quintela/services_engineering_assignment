@@ -1,4 +1,3 @@
-import json
 import boto3
 
 clientRekognition = boto3.client("rekognition")
@@ -6,25 +5,26 @@ clientRekognition = boto3.client("rekognition")
 
 def lambda_handler(event, context):
 
-    bucket_image = event["imageKey"]
+    username = event["username"]
     bucket_name = event["bucketName"]
+    collection_id = event["collectionId"]
 
     try:
-        response = clientRekognition.compare_faces(
-            SourceImage={"S3Object": {"Bucket": bucket_name, "Name": bucket_image}},
-            TargetImage={"S3Object": {"Bucket": bucket_name, "Name": bucket_image}},
-            SimilarityThreshold=90,
+        response = clientRekognition.index_faces(
+            CollectionId=collection_id,
+            Image={
+                "S3Object": {
+                    "Bucket": bucket_name,
+                    "Name": username
+                }
+            },
+            MaxFaces=1
         )
     except clientRekognition.exceptions.InvalidS3ObjectException:
-        return json.dumps(
-            {
-                "error": f"Object with key '{bucket_image}' doesn't exist on bucket '{bucket_name}'."
-            },
-            indent=2,
-        )
+        return {
+                "error": f"Object with key '{username}' doesn't exist on bucket '{bucket_name}'."
+            }
 
-    if response["FaceMatches"]:
-        return json.dumps(
-            {"comparison_result": response["FaceMatches"][0]["Similarity"]}, indent=2
-        )
-    return json.dumps({"comparison_result": 0}, indent=2)
+    if response["FaceRecords"]:
+        return {"faceId": response["FaceRecords"][0]["Face"]["FaceId"], "username": username}
+    return {"error": "No faces were detected."}

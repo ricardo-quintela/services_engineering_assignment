@@ -1,6 +1,6 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import { NotificationData } from "../interfaces/notification";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -19,11 +19,20 @@ const AppointementsDashboard = ({
 		[] as AppointmentData[]
 	);
 
+	// Variável para decidir quando abre o menu de pagamento
 	const [payment_window, setPaymentWindow] = useState(false);
+	// Variável para guardar o ID da consulta
 	const [appointmentId, setAppointmentId] = useState(-1);
+	// Variável para decidir se abre o menu com as informações de pagamento
 	const [paymentDocs, setPaymentDocs] = useState(false);
+	// Variável para guardar as informações de pagamento
 	const [infoPayment, setInfoPayment] = useState<PaymentInfo | null>(null);
+	// Variável para pedir o numero de telemovel
+	const [askTele, setAskTele] = useState(false);
+	const [numTele, setNumTele] = useState(0);
+	// Variável para guardar o index da consulta na tela
 	const [indexSafe, setIndexSafe] = useState(-1);
+	// Corre ao abrir a página
 	const [ranQuery, setRanQuery] = useState(false);
 
 	if (!ranQuery) {
@@ -49,9 +58,11 @@ const AppointementsDashboard = ({
 			);
 	}
 
-	const handlePayAppointment = (appointmentId: number, optionId: number) => {
 
-		const url = process.env.REACT_APP_API_URL + `payment/${appointmentId}/${optionId}`;
+	// Pedimos informações para ser possível proceder ao pagamento
+	const handlePayAppointment = (optionId: number) => {
+
+		const url = process.env.REACT_APP_API_URL + `payment/${optionId}/${numTele}`;
 		console.log(url);
 
 		axios
@@ -75,6 +86,7 @@ const AppointementsDashboard = ({
 					};
 				setInfoPayment(paymentInfo);
 				setPaymentDocs(true);
+				setNumTele(0);
 				addNotification({
 					title: "Success",
 					message: "Please, procide with the payment.",
@@ -88,15 +100,15 @@ const AppointementsDashboard = ({
 			);
 	};
 
+	// Atualização da consulta
 	const handleUpdateAppoitment = (appointmentId: number, index: number) => {
 
 		setIndexSafe(-1);
-
 		axios
             .put(
                 process.env.REACT_APP_API_URL +
                     `appointments/${appointmentId}/`,
-                { estado: "closed" }
+                { estado: "payed" }
             )
             .then((response) => {
                 if ("error" in response.data) {
@@ -106,6 +118,11 @@ const AppointementsDashboard = ({
                     });
                     return;
                 }
+
+				addNotification({
+                    title: "Success",
+                    message: "Pago com sucesso.",
+                })
 
                 setAppointmentData(
                     appointmentData.map((data, i) => {
@@ -142,7 +159,6 @@ const AppointementsDashboard = ({
 									{data.estado !== "closed" && (
 										<Badge bg="primary" pill>
 											{
-
                                                 {
                                                     open: "Aberta",
                                                     ongoing: "A decorrer",
@@ -181,17 +197,20 @@ const AppointementsDashboard = ({
 					<div className="container overflow-hidden text-center mt-5">
 						<div className="row g-3">
 							<div className="col">
-								<button type="button" className="btn btn-primary btn-bg" onClick={() => handlePayAppointment(appointmentId, 1)}>
+								<button type="button" className="btn btn-primary btn-bg" onClick={() => {
+									setAskTele(true);
+									setPaymentDocs(true);
+								}}>
 									MbWay
 								</button>
 							</div>
 							<div className="col">
-								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(appointmentId, 2)}>
+								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(2)}>
 									Multibanco
 								</button>					
 							</div>
 							<div className="col">
-								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(appointmentId, 3)}>
+								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(3)}>
 									Balcão
 								</button>					
 							</div>
@@ -199,7 +218,29 @@ const AppointementsDashboard = ({
 					</div>
 					</>
 				}
-				{paymentDocs && 
+				{askTele && 
+					<>
+					<h2 className="text-center"> Insira o seu número de telemóvel </h2>
+					<div className="container overflow-hidden text-center mt-5">
+						<form>
+							<div className="row g-5">
+								<div className="col">
+									<input type="text" className="form-control" id="telemovel" onChange={(event) => setNumTele(Number(event?.target.value)) }/>
+								</div>
+								<div className="col">
+									<button type="submit" className="btn btn-primary btn-bg" onClick={() => {
+										setAskTele(false);
+										handlePayAppointment(1);
+										}}>
+										Proceguir
+									</button>					
+								</div>
+							</div>	
+						</form>
+					</div>
+					</>
+				}
+				{(paymentDocs && !askTele) && 
 				<>
 				<h2 className="text-center"> Selecionou o método de pagamento. Use a seguinte informação: </h2>
 				{infoPayment != null && 
@@ -207,7 +248,16 @@ const AppointementsDashboard = ({
 						infoPayment={infoPayment}
 					/>
 				}
-				<button type="button" className="btn btn-primary btn-bg" onClick={() =>  {setPaymentWindow(false); setPaymentDocs(false); setInfoPayment(null); handleUpdateAppoitment(appointmentId, indexSafe)}}>
+				<button type="button" className="btn btn-primary btn-bg" 
+					onClick={() =>  
+					{
+						setPaymentWindow(false); 
+						setPaymentDocs(false); 
+						setInfoPayment(null); 
+						handleUpdateAppoitment(appointmentId, indexSafe);
+						}
+					}
+				>
 					Pagamento Feito
 				</button>					
 				</>

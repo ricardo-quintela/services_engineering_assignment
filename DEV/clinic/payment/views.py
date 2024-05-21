@@ -6,10 +6,9 @@ from rest_framework.decorators import api_view
 ENTIDADE = 12345
 
 @api_view(["GET"])
-def payment_option(request: HttpRequest, _id: int, option: int) -> JsonResponse:
+def payment_option(request: HttpRequest, option: int, telemovel: int) -> JsonResponse:
     
     if option == 1:
-        telemovel = request.data.get("telemovel")
         valor: float = random.randint(5, 25)
         return JsonResponse({"telemovel": telemovel, "valor": valor})
     elif option == 2:

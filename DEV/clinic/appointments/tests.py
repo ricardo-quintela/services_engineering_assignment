@@ -45,6 +45,7 @@ class TestAppointments(BaseTestCase):
             response.content,
             [
                 {
+                    "id": response.content.id,
                     "user": UserSerializer(appointment.user).data,
                     "data_appointment": appointment.data_appointment,
                     "hora": appointment.hora,
@@ -75,6 +76,7 @@ class TestAppointments(BaseTestCase):
         self.assertJSONEqual(
             response.content,
             {
+                "id": 1,
                 "user": UserSerializer(self.appointments[0].user).data,
                 "data_appointment": self.appointments[0].data_appointment,
                 "hora": self.appointments[0].hora,
@@ -105,7 +107,18 @@ class TestAppointments(BaseTestCase):
             headers={"jwt": generate_token(self.users[0])},
         )
 
-        self.assertJSONEqual(response.content, {"error": "Forbidden."})
+        self.assertJSONEqual(
+            response.content,
+            {
+                "id": 1,
+                "user": UserSerializer(self.appointments[0].user).data,
+                "data_appointment": self.appointments[0].data_appointment,
+                "hora": self.appointments[0].hora,
+                "especialidade": self.appointments[0].especialidade,
+                "medico": self.appointments[0].medico,
+                "estado": "closed",
+            },
+        )
 
     @patch("aws_middleware.stepfunctions.client.describe_execution")
     def test_scheduling(self, mock_describer):

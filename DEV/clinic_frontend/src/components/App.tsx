@@ -8,10 +8,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SchedullingForm from "./SchedullingForm";
 import RegisterForm from "./RegisterForm";
 import ProtectedRoute from "./ProtectedRoute";
-import { getCookies } from "../cookies";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
 import LandingPage from "./LandingPage";
+import AppointementsDashboard from "./AppointementsDashboard";
 import CameraFeed from "./CameraFeed";
 import axios from "axios";
 import Profile from "./Profile";
@@ -37,7 +37,11 @@ const App = () => {
             (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload)
                 .role) === "admin";
 
-    const checkLogin = () => localStorage.getItem("jwt") !== "";
+    const checkCommonUser = () =>
+        (localStorage.getItem("jwt") &&
+            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role) !== "admin";
+
+	const checkLogin = () => localStorage.getItem("jwt") !== "";
 
     return (
         <>
@@ -117,6 +121,26 @@ const App = () => {
                                     }}
                                 >
                                     <AdminDashboard
+                                        key={0}
+                                        addNotification={addNotification}
+                                    />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/list_appointements"
+                            element={
+                                <ProtectedRoute
+                                    condition={checkCommonUser}
+                                    redirectTo="/"
+                                    addNotification={addNotification}
+                                    notificationData={{
+                                        title: "Acesso Negado",
+                                        message:
+                                            "Não tem permissões para aceder a este recurso.",
+                                    }}
+                                >
+                                    <AppointementsDashboard
                                         key={0}
                                         addNotification={addNotification}
                                     />

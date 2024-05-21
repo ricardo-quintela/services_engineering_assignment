@@ -55,7 +55,13 @@ RDS_USER = os.environ.get("RDS_USER", "postgres")
 RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")
 
 
-ALLOWED_HOSTS = [EBS_HOST, STEP_FUNCTION, "18.208.0.153"]
+ALLOWED_HOSTS = [
+    EBS_HOST,
+    STEP_FUNCTION,
+    "18.208.0.153",
+    "127.0.0.1",
+    "172.31.4.96"
+]
 
 CORS_ALLOWED_ORIGINS = [S3_STATIC_SITE_URL]
 CORS_ALLOW_CREDENTIALS = True
@@ -76,6 +82,7 @@ INSTALLED_APPS = [
     "authentication",
     "clinic",
     "appointments",
+    "payment"
 ]
 
 MIDDLEWARE = [

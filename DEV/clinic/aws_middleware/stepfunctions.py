@@ -4,7 +4,7 @@ import boto3
 from django.http import JsonResponse
 
 
-MAX_RETRIES = 3
+MAX_RETRIES = 10
 TIMEOUT = 1
 
 

@@ -4,6 +4,7 @@ from django.core.exceptions import FieldDoesNotExist
 
 from rest_framework.decorators import api_view
 from authentication.jwt import perm_required, validate_token, requires_jwt
+from django.contrib.auth.models import User
 from aws_middleware.stepfunctions import execute_workflow
 
 from .models import Consultas
@@ -20,8 +21,20 @@ def all_appointments_view(_: HttpRequest) -> JsonResponse:
 
     return JsonResponse(serializer.data, safe=False)
 
+@api_view(["GET"])
+def all_appointments_view_id(request: HttpRequest) -> JsonResponse:
+    
+    token = request.headers["jwt"]
+    username = validate_token(token)["username"]
+    user_id = User.objects.filter(username=username).values()[0]["id"]
+    
+    appointments = Consultas.objects.filter(user=user_id)
 
-@perm_required("admin")
+    serializer = AppointmentSerializer(appointments, many=True)
+
+    return JsonResponse(serializer.data, safe=False)
+
+
 @api_view(["PUT"])
 def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
@@ -71,9 +84,9 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             "cliente": username,
             "data": data,
             "hora": hora,
-            "especialidade": especialidade,
+            "especialidade": especialidade, 
             "medico": medico,
             "estado": "open",
         },
-        "arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
+        "arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
     )

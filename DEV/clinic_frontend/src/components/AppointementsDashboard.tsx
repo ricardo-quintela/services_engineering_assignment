@@ -24,8 +24,10 @@ const AppointementsDashboard = ({
 	const [paymentDocs, setPaymentDocs] = useState(false);
 	const [infoPayment, setInfoPayment] = useState<PaymentInfo | null>(null);
 	const [indexSafe, setIndexSafe] = useState(-1);
+	const [ranQuery, setRanQuery] = useState(false);
 
-	if (appointmentData.length === 0) {
+	if (!ranQuery) {
+		setRanQuery(true);
 		axios
 			.get(process.env.REACT_APP_API_URL + "appointments_list/")
 			.then((response) => {

@@ -45,7 +45,7 @@ class TestAppointments(BaseTestCase):
             response.content,
             [
                 {
-                    "id": response.content.id,
+                    "id": appointment.id,
                     "user": UserSerializer(appointment.user).data,
                     "data_appointment": appointment.data_appointment,
                     "hora": appointment.hora,

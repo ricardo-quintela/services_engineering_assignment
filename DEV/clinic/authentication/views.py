@@ -147,7 +147,7 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
 
     response = execute_workflow(
         {
-            "type": "getFacePrint",
+            "type": "getFaceprint",
             "arguments": {
                 "username": username,
                 "bucketName": S3_IMAGE_BUCKET_NAME,
@@ -195,7 +195,7 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
             {"error": f"An error occured while uploading the image: {status}"}
         )
 
-    return execute_workflow(
+    response = execute_workflow(
         {
             "type": "facialRecognition",
             "arguments": {
@@ -205,4 +205,11 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
             },
         },
         STATE_MACHINE_ARN,
+    )
+
+    if json.loads(response.content)["statusCode"] == 200:
+        return JsonResponse({"message": json.loads(json.loads(response.content)["message"])["Item"]["username"]["S"]})
+
+    return JsonResponse(
+        {"error": f"An error occured while uploading the image: {json.loads(response.content)['error']}"}
     )

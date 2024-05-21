@@ -2,15 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
 import { Badge, Button, Container } from "react-bootstrap";
-import Card from "react-bootstrap/Card";
 import { NotificationData } from "../interfaces/notification";
 import ListGroup from "react-bootstrap/ListGroup";
 import { AppointmentData } from "../interfaces/appointment";
 import CameraFeed from "./CameraFeed";
 
 axios.defaults.withCredentials = true;
-
-const SIMILARITY_THRESHOLD = 90;
 
 const AdminDashboard = ({
     addNotification,
@@ -77,25 +74,17 @@ const AdminDashboard = ({
     };
 
     const handleFacialRecognitionResponse = (response: AxiosResponse) => {
-        const comparison_result =
-            "message" in response.data
-                ? response.data.message.comparison_result
-                : null;
-
-        if (comparison_result === null) {
+        if ("message" in response.data) {
             addNotification({
-                title: "Erro",
-                message: "Ocorreu um erro ao autenticar o cliente.",
+                title: "Sucesso",
+                message: `Cliente autenticado: ${response.data["message"]}`
             });
             return;
         }
 
         addNotification({
-            title: "message" in response.data ? "Sucesso" : "Error",
-            message:
-                comparison_result >= SIMILARITY_THRESHOLD
-                    ? "Cliente autenticado"
-                    : "Cliente não foi reconhecido",
+            title: "Erro",
+            message: "Cliente não reconhecido."
         });
     };
 
@@ -151,7 +140,6 @@ const AdminDashboard = ({
                     addNotification={addNotification}
                     uploadTo="recognition/"
                     successHandler={handleFacialRecognitionResponse}
-					aditionalFormInputs={[{inputLabel: "Nome de utilizador do cliente", inputField: <input id="username"/>}]}
                 />
             </Container>
         </div>

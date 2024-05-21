@@ -3,15 +3,10 @@ import {
     ChangeEvent,
     FormEvent,
     ReactElement,
-    createRef,
-    useEffect,
-    useRef,
     useState,
 } from "react";
 import { Container, Form } from "react-bootstrap";
 import { NotificationData } from "../interfaces/notification";
-import { JsxElement } from "typescript";
-import { access } from "fs";
 
 const CameraFeed = ({
     addNotification,
@@ -36,7 +31,6 @@ const CameraFeed = ({
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-
         if (files === null) {
             addNotification({
                 title: "Carregar imagem",
@@ -48,20 +42,21 @@ const CameraFeed = ({
         const formData = new FormData();
         formData.append("file", files[0], files[0].name);
 
-        Array.from(
-            e.currentTarget.children[0].children
-        )
+        Array.from(e.currentTarget.children[0].children)
             .filter((_, index) => index % 2 === 1)
             .map((element) => element as HTMLInputElement)
-            .forEach(element => formData.append(element.id, element.value));
+            .forEach((element) => formData.append(element.id, element.value));
 
         axios
             .post(process.env.REACT_APP_API_URL + uploadTo, formData)
             .then((response) => successHandler(response))
-            .catch(() => {
+            .catch((response) => {
                 addNotification({
                     title: "Error",
-                    message: "An error has occured.",
+                    message:
+                        "error" in response.data
+                            ? response.data["error"]
+                            : "An error has occurred.",
                 });
             });
     };

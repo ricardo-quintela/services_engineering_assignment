@@ -1,0 +1,8 @@
+{
+    "type": "getFaceprint",
+    "arguments": {
+        "username": "ronaldo",
+        "bucketName": "image.clinic",
+        "collectionId": "clinic.faces"
+    }
+}

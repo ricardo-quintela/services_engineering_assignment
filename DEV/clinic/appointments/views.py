@@ -10,6 +10,8 @@ from aws_middleware.stepfunctions import execute_workflow
 from .models import Consultas
 from .serializers import AppointmentSerializer
 
+from clinic.settings import STATE_MACHINE_ARN
+
 
 @perm_required("admin")
 @api_view(["GET"])
@@ -88,5 +90,5 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             "medico": medico,
             "estado": "open",
         },
-        "arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
+        STATE_MACHINE_ARN
     )

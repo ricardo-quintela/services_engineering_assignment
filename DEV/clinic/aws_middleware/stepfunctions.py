@@ -46,8 +46,8 @@ def execute_workflow(payload: dict, resource_arn: str) -> JsonResponse:
 
         if status in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]:
             if status == "FAILED":
-                return JsonResponse({"error": response["error"], "statusCode": 500})
-            return JsonResponse({"message": json.loads(response["output"]), "statusCode": 200})
+                return JsonResponse({"error": response["cause"], "statusCode": 500})
+            return JsonResponse({"message": response["output"], "statusCode": 200})
 
         time.sleep(1)
 

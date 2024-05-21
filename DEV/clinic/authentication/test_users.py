@@ -51,10 +51,13 @@ class TestUserEndPoints(BaseTestCase):
             ],
         )
 
-    @patch("aws_middleware.s3.client")
-    def test_upload_file(self, mock_boto_client):
+    @patch("aws_middleware.stepfunctions.client.describe_execution")
+    def test_upload_file(self, mock_describer):
         """Tests if an authenticated user can upload a profile picture"""
-        mock_boto_client.return_value = boto3.client("s3")
+        mock_describer.return_value = {
+            "status": "SUCCEEDED",
+            "output": "stepfunction output",
+        }
 
         image = SimpleUploadedFile(
             "profile.jpg", b"image_content", content_type="image/jpeg"

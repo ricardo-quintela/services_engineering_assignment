@@ -26,13 +26,26 @@ SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-EBS_HOST = os.environ.get("EBS_HOST", "localhost") # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
+EBS_HOST = os.environ.get(
+    "EBS_HOST", "localhost"
+)  # "django-env.eba-p3m7aa6p.us-east-1.elasticbeanstalk.com"
 STEP_FUNCTION = os.environ.get("STEP_FUNCTION", "172.31.43.159")
 
-S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", None) 
-S3_STATIC_SITE_URL = os.environ.get("S3_STATIC_SITE_URL", "http://localhost:3000") # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", None)
+S3_STATIC_SITE_URL = os.environ.get(
+    "S3_STATIC_SITE_URL", "http://localhost:3000"
+)  # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
 S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
+
+# Rekognition
+REKOGNITION_COLLECTION_ID = os.environ.get("REKOGNITION_COLLECTION_ID", "clinic.faces")
+
+# State machine - Workflow
+STATE_MACHINE_ARN = os.environ.get(
+    "STATE_MACHINE_ARN",
+    "arn:aws:states:us-east-1:123456789012:stateMachine:clinicStateMachine",
+)
 
 # RDS
 RDS_NAME = os.environ.get("RDS_NAME", "rds.clinic")
@@ -50,18 +63,10 @@ ALLOWED_HOSTS = [
     "172.31.4.96"
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    S3_STATIC_SITE_URL
-]
+CORS_ALLOWED_ORIGINS = [S3_STATIC_SITE_URL]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    "jwt",
-    "content-type"
-]
-CORS_EXPOSE_HEADERS = [
-    "jwt"
-]
-
+CORS_ALLOW_HEADERS = ["jwt", "content-type"]
+CORS_EXPOSE_HEADERS = ["jwt"]
 
 
 # Application definition
@@ -122,12 +127,12 @@ DATABASES = {
         "NAME": RDS_NAME,
         "PASSWORD": RDS_PASSWORD,
         "HOST": RDS_HOST,
-        "PORT": RDS_PORT
+        "PORT": RDS_PORT,
     },
     "testing": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3"
-    }
+        "NAME": BASE_DIR / "db.sqlite3",
+    },
 }
 
 

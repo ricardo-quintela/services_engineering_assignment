@@ -16,7 +16,7 @@
               "StringEquals": "facialRecognition"
             }
           ],
-          "Next": "Validar Input"
+          "Next": "Validação 1"
         },
         {
           "And": [
@@ -26,15 +26,19 @@
             },
             {
               "Variable": "$.type",
-              "StringEquals": "$.getFaceprint"
+              "StringEquals": "getFaceprint"
             }
           ],
-          "Next": "Choice"
+          "Next": "Validação 2"
         }
       ],
-      "Default": "Success"
+      "Default": "Formato inválido"
     },
-    "Choice": {
+    "Formato inválido": {
+      "Type": "Fail",
+      "Cause": "Input payload is in an invalid format."
+    },
+    "Validação 2": {
       "Type": "Choice",
       "Choices": [
         {
@@ -46,21 +50,39 @@
             {
               "Variable": "$.arguments.username",
               "IsString": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsString": true
             }
           ],
           "Next": "Obter Impressão Facial"
         }
       ],
-      "Default": "Success"
+      "Default": "Formato inválido"
     },
     "Obter Impressão Facial": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST",
+        "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:getFacialPrint:$LATEST",
         "Payload": {
-          "username": "$.arguments.username"
+          "username.$": "$.arguments.username",
+          "bucketName.$": "$.arguments.bucketName",
+          "collectionId.$": "$.arguments.collectionId"
         }
       },
       "Retry": [
@@ -76,19 +98,50 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "Success"
+      "Next": "Verificação de erros 2"
     },
-    "Validar Input": {
+    "Verificação de erros 2": {
       "Type": "Choice",
       "Choices": [
         {
           "And": [
             {
-              "Variable": "$.arguments.imageKey",
+              "Variable": "$.faceId",
               "IsPresent": true
             },
             {
-              "Variable": "$.arguments.imageKey",
+              "Variable": "$.username",
+              "IsPresent": true
+            }
+          ],
+          "Next": "Guardar Impressão Facial"
+        }
+      ],
+      "Default": "Formato inválido"
+    },
+    "Guardar Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "clinic.faces",
+        "Item": {
+          "faceId.$": "$.faceId",
+          "username.$": "$.username"
+        }
+      },
+      "Next": "Success"
+    },
+    "Validação 1": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.arguments.imageUUID",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.imageUUID",
               "IsString": true
             },
             {
@@ -97,13 +150,21 @@
             },
             {
               "Variable": "$.arguments.bucketName",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
               "IsString": true
             }
           ],
           "Next": "Fazer Reconhecimento Facial"
         }
       ],
-      "Default": "Success"
+      "Default": "Formato inválido"
     },
     "Fazer Reconhecimento Facial": {
       "Type": "Task",
@@ -112,8 +173,9 @@
       "Parameters": {
         "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST",
         "Payload": {
-          "imageKey": "$.arguments.imageKey",
-          "bucketName": "$.arguments.bucketName"
+          "imageUUID.$": "$.arguments.imageUUID",
+          "bucketName.$": "$.arguments.bucketName",
+          "collectionId.$": "$.arguments.collectionId"
         }
       },
       "Retry": [
@@ -129,7 +191,54 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "Success"
+      "Next": "DeleteObject"
+    },
+    "DeleteObject": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket.$": "$.bucketName",
+        "Key.$": "$.imageUUID"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Next": "Verificação de erros 1",
+      "ResultPath": null
+    },
+    "Verificação de erros 1": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.faceId",
+          "IsPresent": true,
+          "Next": "Verificar Impressão Facial"
+        }
+      ],
+      "Default": "Formato inválido"
+    },
+    "Verificar Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Parameters": {
+        "TableName": "clinic.faces",
+        "Key": {
+          "faceId.$": "$.faceId"
+        }
+      },
+      "Next": "Verificação de correspondência"
+    },
+    "Verificação de correspondência": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Item",
+          "IsPresent": true,
+          "Next": "Success"
+        }
+      ],
+      "Default": "Não existe correspondência"
+    },
+    "Não existe correspondência": {
+      "Type": "Fail",
+      "Cause": "No match for face print."
     },
     "Success": {
       "Type": "Succeed"

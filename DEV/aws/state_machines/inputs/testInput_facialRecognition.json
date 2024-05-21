@@ -1,0 +1,8 @@
+{
+    "type": "facialRecognition",
+    "arguments": {
+        "imageUUID": "custom_uuid_from_s3_image",
+        "bucketName": "image.clinic",
+        "collectionId": "clinic.faces"
+    }
+}

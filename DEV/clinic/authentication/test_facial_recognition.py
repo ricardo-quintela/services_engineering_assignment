@@ -13,7 +13,7 @@ class TestFacialRecognition(BaseTestCase):
         """Tests if an admin can run a facial recognition workflow"""
         mock_describer.return_value = {
             "status": "SUCCEEDED",
-            "output": '"{\\"comparison_result\\": 100}"',
+            "output": {"comparison_result": 100},
         }
 
         image = SimpleUploadedFile(

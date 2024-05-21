@@ -12,7 +12,10 @@ axios.defaults.withCredentials = true;
 
 function SchedullingForm() {
     // Mexemos na imagem e guardamos o estado atual
-    const [imagemAtual, setImagemAtual] = useState(atanagildoImagem);
+    const [imagemAtual, setImagemAtual] = useState("Nada");
+    const [loading, setLoading] = useState(false);
+
+
     const handleChangeSlide = (eventKey: number) => {
         if (eventKey === 0) {
             setImagemAtual("NADA");
@@ -34,6 +37,7 @@ function SchedullingForm() {
             inputEspecialidade: { value: string };
         };
         
+        setLoading(true);
         axios
             .post(process.env.REACT_APP_API_URL + "scheduling/", {
                 data: payload.inputData.value,
@@ -42,15 +46,18 @@ function SchedullingForm() {
                 medico: imagemAtual
             }
             ).then((response) => {
+                setLoading(false);
                 if ("message" in response.data){
                     navigate("/");
                 }
             })
-            .catch((response) => console.log(response));
+            .catch((response) => {setLoading(false);console.log(response);});
     };
 
     return (
-        <>
+        <>  
+            {!loading &&
+            <div>
             <h1>Marcação de consulta</h1>
             <form
                 className="d-flex p-5 flex-column gap-3 border"
@@ -155,6 +162,13 @@ function SchedullingForm() {
                     Submit
                 </button>
             </form>
+            </div>
+            }
+            {loading &&
+            <div className="spinner-border m-5" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+            }
         </>
     );
 }

@@ -5,6 +5,8 @@ import { Badge, Button } from "react-bootstrap";
 import { NotificationData } from "../interfaces/notification";
 import ListGroup from "react-bootstrap/ListGroup";
 import { AppointmentData } from "../interfaces/appointment";
+import { PaymentInfo } from "../interfaces/paymentInfoInterface";
+import InfoPayment from "./InfoPayment"
 
 axios.defaults.withCredentials = true;
 
@@ -16,6 +18,12 @@ const AppointementsDashboard = ({
 	const [appointmentData, setAppointmentData] = useState(
 		[] as AppointmentData[]
 	);
+
+	const [payment_window, setPaymentWindow] = useState(false);
+	const [appointmentId, setAppointmentId] = useState(-1);
+	const [paymentDocs, setPaymentDocs] = useState(false);
+	const [infoPayment, setInfoPayment] = useState<PaymentInfo | null>(null);
+	const [indexSafe, setIndexSafe] = useState(-1);
 
 	if (appointmentData.length === 0) {
 		axios
@@ -39,12 +47,14 @@ const AppointementsDashboard = ({
 			);
 	}
 
-	const handlePayAppointment = (appointmentId: number, index: number) => {
+	const handlePayAppointment = (appointmentId: number, optionId: number) => {
+
+		const url = process.env.REACT_APP_API_URL + `payment/${appointmentId}/${optionId}`;
+		console.log(url);
+
 		axios
-			.put(
-				process.env.REACT_APP_API_URL +
-					`appointments/${appointmentId}/`,
-				{ estado: "pago" }
+			.get(
+				url
 			)
 			.then((response) => {
 				if ("error" in response.data) {
@@ -54,13 +64,19 @@ const AppointementsDashboard = ({
 					});
 					return;
 				}
-
-				setAppointmentData(
-					appointmentData.map((data, i) => {
-						if (i !== index) return data;
-						return response.data;
-					})
-				);
+				
+				const paymentInfo: PaymentInfo = {
+					  entidade: response.data.entidade ?? undefined,
+					  referencia: response.data.referencia ?? undefined,
+					  telemovel: response.data.telemovel ?? undefined,
+					  valor: response.data.valor ?? undefined,
+					};
+				setInfoPayment(paymentInfo);
+				setPaymentDocs(true);
+				addNotification({
+					title: "Success",
+					message: "Please, procide with the payment.",
+				})
 			})
 			.catch(() =>
 				addNotification({
@@ -68,6 +84,40 @@ const AppointementsDashboard = ({
 					message: "An error occured while closing the appointment.",
 				})
 			);
+	};
+
+	const handleUpdateAppoitment = (appointmentId: number, index: number) => {
+
+		setIndexSafe(-1);
+
+		axios
+            .put(
+                process.env.REACT_APP_API_URL +
+                    `appointments/${appointmentId}/`,
+                { estado: "closed" }
+            )
+            .then((response) => {
+                if ("error" in response.data) {
+                    addNotification({
+                        title: "Erro",
+                        message: response.data["error"],
+                    });
+                    return;
+                }
+
+                setAppointmentData(
+                    appointmentData.map((data, i) => {
+                        if (i !== index) return data;
+                        return response.data;
+                    })
+                );
+            })
+            .catch(() =>
+                addNotification({
+                    title: "Erro",
+                    message: "Ocorreu um erro ao fechar a consulta.",
+                })
+            );
 	};
 
 	return (
@@ -107,9 +157,12 @@ const AppointementsDashboard = ({
 							</div>
 
 							<Button
-								disabled={data.estado === "closed"}
-								onClick={() =>
-									handlePayAppointment(data.id, index)
+								disabled={data.estado === "payed" || data.estado === "closed"}
+									onClick={() => {
+										setAppointmentId(data.id);
+										setIndexSafe(index);
+										setPaymentWindow(!payment_window ? true : false);
+									}
 								}
 							>
 								Pagar
@@ -118,8 +171,54 @@ const AppointementsDashboard = ({
 					))}
 				</ListGroup>
 			</div>
+			{payment_window && 
+				<div className="z-3 position-absolute p-5 rounded-3 top-50 start-50 translate-middle bg-body-secondary w-170 border">
+				{!paymentDocs &&
+					<>
+					<h2 className="text-center"> Escolha o método de pagamento </h2>
+					<div className="container overflow-hidden text-center mt-5">
+						<div className="row g-3">
+							<div className="col">
+								<button type="button" className="btn btn-primary btn-bg" onClick={() => handlePayAppointment(appointmentId, 1)}>
+									MbWay
+								</button>
+							</div>
+							<div className="col">
+								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(appointmentId, 2)}>
+									Multibanco
+								</button>					
+							</div>
+							<div className="col">
+								<button type="button" className="btn btn-primary btn-bg" onClick={() =>  handlePayAppointment(appointmentId, 3)}>
+									Balcão
+								</button>					
+							</div>
+						</div>	
+					</div>
+					</>
+				}
+				{paymentDocs && 
+				<>
+				<h2 className="text-center"> Selecionou o método de pagamento. Use a seguinte informação: </h2>
+				{infoPayment != null && 
+					<InfoPayment 
+						infoPayment={infoPayment}
+					/>
+				}
+				<button type="button" className="btn btn-primary btn-bg" onClick={() =>  {setPaymentWindow(false); setPaymentDocs(false); setInfoPayment(null); handleUpdateAppoitment(appointmentId, indexSafe)}}>
+					Pagamento Feito
+				</button>					
+				</>
+			}
+			</div>
+			}
 		</div>
 	);
 };
 
 export default AppointementsDashboard;
+
+
+// process.env.REACT_APP_API_URL +
+//                     `appointments/${appointmentId}/`,
+//                 { estado: "closed" }

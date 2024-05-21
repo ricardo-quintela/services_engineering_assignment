@@ -10,4 +10,4 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Consultas
-        fields = ["user", "data_appointment", "hora", "especialidade", "medico", "estado"]
+        fields = ["id", "user", "data_appointment", "hora", "especialidade", "medico", "estado"]

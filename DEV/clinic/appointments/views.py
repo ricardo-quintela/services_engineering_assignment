@@ -35,7 +35,6 @@ def all_appointments_view_id(request: HttpRequest) -> JsonResponse:
     return JsonResponse(serializer.data, safe=False)
 
 
-@perm_required("admin")
 @api_view(["PUT"])
 def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
@@ -85,9 +84,9 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             "cliente": username,
             "data": data,
             "hora": hora,
-            "especialidade": especialidade,
+            "especialidade": especialidade, 
             "medico": medico,
             "estado": "open",
         },
-        "arn:aws:states:us-east-1:123456789012:stateMachine:InsereMarcacao",
+        "arn:aws:states:us-east-1:497624740126:stateMachine:InsereMarcacao",
     )

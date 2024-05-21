@@ -191,7 +191,17 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "Verificação de erros 1"
+      "Next": "DeleteObject"
+    },
+    "DeleteObject": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket.$": "$.bucketName",
+        "Key.$": "$.imageUUID"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Next": "Verificação de erros 1",
+      "ResultPath": null
     },
     "Verificação de erros 1": {
       "Type": "Choice",
@@ -221,10 +231,10 @@
         {
           "Variable": "$.Item",
           "IsPresent": true,
-          "Next": "Não existe correspondência"
+          "Next": "Success"
         }
       ],
-      "Default": "Formato inválido"
+      "Default": "Não existe correspondência"
     },
     "Não existe correspondência": {
       "Type": "Fail",

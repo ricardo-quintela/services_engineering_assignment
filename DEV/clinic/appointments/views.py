@@ -74,9 +74,9 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
         especialidade = int(request.data["especialidade"])
         medico = request.data["medico"]
     except KeyError:
-        return JsonResponse({"error": "Invalid payload."})
+        return JsonResponse({"error": "Parâmetros inválidos."})
     except ValueError:
-        return JsonResponse({"error": "Invalid payload."})
+        return JsonResponse({"error": "Parâmetros inválidos."})
 
     token = request.headers["jwt"]
     username = validate_token(token)["username"]

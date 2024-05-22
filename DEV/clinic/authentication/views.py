@@ -141,9 +141,7 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
             image_key=username, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image
         )
     ) != True:
-        return JsonResponse(
-            {"error": f"Erro ao dar upload da imagem: {status}"}
-        )
+        return JsonResponse({"error": f"Erro ao dar upload da imagem: {status}"})
 
     response = execute_workflow(
         {
@@ -154,14 +152,16 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
                 "collectionId": REKOGNITION_COLLECTION_ID,
             },
         },
-        STATE_MACHINE_ARN
+        STATE_MACHINE_ARN,
     )
 
     if json.loads(response.content)["statusCode"] == 200:
         return JsonResponse({"message": "Imagem enviada com sucesso."})
 
     return JsonResponse(
-        {"error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"}
+        {
+            "error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"
+        }
     )
 
 
@@ -191,9 +191,7 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
             image_key=image_uuid, bucket_name=S3_IMAGE_BUCKET_NAME, image_file=image
         )
     ) != True:
-        return JsonResponse(
-            {"error": f"Erro ao dar upload da imagem: {status}"}
-        )
+        return JsonResponse({"error": f"Erro ao dar upload da imagem: {status}"})
 
     response = execute_workflow(
         {
@@ -208,8 +206,16 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
     )
 
     if json.loads(response.content)["statusCode"] == 200:
-        return JsonResponse({"message": json.loads(json.loads(response.content)["message"])["Item"]["username"]["S"]})
+        return JsonResponse(
+            {
+                "message": json.loads(json.loads(response.content)["message"])["Item"][
+                    "username"
+                ]["S"]
+            }
+        )
 
     return JsonResponse(
-        {"error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"}
+        {
+            "error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"
+        }
     )

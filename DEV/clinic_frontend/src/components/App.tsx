@@ -12,7 +12,6 @@ import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "../interfaces/jwt";
 import LandingPage from "./LandingPage";
 import AppointementsDashboard from "./AppointementsDashboard";
-import CameraFeed from "./CameraFeed";
 import axios from "axios";
 import Profile from "./Profile";
 
@@ -39,9 +38,10 @@ const App = () => {
 
     const checkCommonUser = () =>
         (localStorage.getItem("jwt") &&
-            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload).role) !== "admin";
+            (jwtDecode(localStorage.getItem("jwt") || "") as JwtPayload)
+                .role) !== "admin";
 
-	const checkLogin = () => localStorage.getItem("jwt") !== "";
+    const checkLogin = () => localStorage.getItem("jwt") !== "";
 
     return (
         <>

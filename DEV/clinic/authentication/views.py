@@ -110,12 +110,12 @@ def login_view(request: HttpRequest) -> JsonResponse:
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        return JsonResponse({"error": "Invalid username."})
+        return JsonResponse({"error": "Username inválido."})
 
     if not user.check_password(password):
-        return JsonResponse({"error": "Invalid password."})
+        return JsonResponse({"error": "Password inválida."})
 
-    response = JsonResponse({"message": "Successfully logged in."})
+    response = JsonResponse({"message": "Logado com sucesso."})
     response.headers["jwt"] = generate_token(user)
 
     return response

@@ -1,4 +1,5 @@
 # pylint: disable=no-member
+import json
 from django.http import HttpRequest, JsonResponse
 from django.core.exceptions import FieldDoesNotExist
 
@@ -11,6 +12,8 @@ from .models import Consultas
 from .serializers import AppointmentSerializer
 
 from clinic.settings import STATE_MACHINE_ARN
+
+from datetime import date
 
 
 @perm_required("admin")
@@ -92,3 +95,20 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
         },
         STATE_MACHINE_ARN
     )
+
+@api_view(["GET"])
+def search_id_appointement(_: HttpRequest, username: str) -> JsonResponse:
+    
+    # Vamos buscar o id do usuário
+    user_id = User.objects.filter(username=username).values()[0]["id"]
+    # Guardamos a data de hoje
+    today = date.today()
+    
+    # Vamos buscar as consultas dele do dia de hoje
+    appointements_ids = Consultas.objects.filter(user=user_id, data_appointment=today)
+    
+    if appointements_ids.exists():
+        serializer = AppointmentSerializer(appointements_ids.first())
+        return JsonResponse({"id": serializer.data["id"]})
+    
+    return JsonResponse({"error": "Nenhuma consulta encontrada para hoje."})

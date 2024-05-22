@@ -53,7 +53,7 @@ const LoginForm = ({
 			.catch(() => {
 				addNotification({
 					title: "Error",
-					message: "An error has occured while attempting to login.",
+					message: "Erro durante o loin.",
 				});
 			});
 	};

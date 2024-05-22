@@ -42,14 +42,14 @@ def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
     appointment = Consultas.objects.filter(id=_id)
     if appointment is None:
-        return JsonResponse({"error": "Appointment does not exist."})
+        return JsonResponse({"error": "Consulta não encontrada."})
 
     json_payload: dict = request.data
 
     try:
         appointment.update(**{k: json_payload.get(k) for k in json_payload})
     except FieldDoesNotExist as e:
-        return JsonResponse({"error": f"{e}"})
+        return JsonResponse({"error": "Erro ao atualizar o estado da consulta."})
 
     serializer = AppointmentSerializer(appointment.first())
 

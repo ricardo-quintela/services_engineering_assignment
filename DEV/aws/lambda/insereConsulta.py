@@ -19,10 +19,13 @@ def lambda_handler(event, context):
     especialidade = event["especialidade"]
     medico = event["medico"]
     
+    user_id = connection.run(f"SELECT id from auth_user where username = '{user}'")
+    user_id = user_id[0][0]
+    
     # Executing SQL queries
     # lista: [['a', 'a', 10, 'a', 'a']]
-    valores = connection.run(f"INSERT INTO CONSULTAS (username, data_appoitment, hora, especialidade, medico, estado) VALUES ('{user}', '{data}', {hora}, {especialidade}, '{medico}', 'Não Pago')")
-    valores = connection.run(f"INSERT INTO MEDICOS (medico, data_appoitment, hora) VALUES ('{medico}', '{data}', {hora})")
+    valores = connection.run(f"INSERT INTO CONSULTAS (user_id, data_appointment, hora, especialidade, medico, estado) VALUES ({user_id}, '{data}', {hora}, {especialidade}, '{medico}', 'Pendente')")
+    valores = connection.run(f"INSERT INTO MEDICOS (medico, data_appointment, hora) VALUES ('{medico}', '{data}', {hora})")
 
     # Closing the cursor
     connection.close()
@@ -31,4 +34,3 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
     }
-

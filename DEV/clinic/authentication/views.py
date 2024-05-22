@@ -131,10 +131,10 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
     try:
         image = request.FILES["file"]
     except KeyError:
-        return JsonResponse({"error": "No image was uploaded."})
+        return JsonResponse({"error": "Nenhuma imagem selecionada."})
 
     if image.size > MAX_FILE_SIZE:
-        return JsonResponse({"error": "Uploaded file excedes max size limit."})
+        return JsonResponse({"error": "Tamanho máximo excedido."})
 
     if (
         status := s3_upload(
@@ -142,7 +142,7 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
         )
     ) != True:
         return JsonResponse(
-            {"error": f"An error occured while uploading the image: {status}"}
+            {"error": f"Erro ao dar upload da imagem: {status}"}
         )
 
     response = execute_workflow(
@@ -158,10 +158,10 @@ def upload_image_view(request: HttpRequest) -> JsonResponse:
     )
 
     if json.loads(response.content)["statusCode"] == 200:
-        return JsonResponse({"message": "Image successfully uploaded."})
+        return JsonResponse({"message": "Imagem enviada com sucesso."})
 
     return JsonResponse(
-        {"error": f"An error occured while uploading the image: {json.loads(response.content)['error']}"}
+        {"error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"}
     )
 
 
@@ -179,10 +179,10 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
     try:
         image = request.FILES["file"]
     except KeyError:
-        return JsonResponse({"error": "No image was uploaded."})
+        return JsonResponse({"error": "Nenhuma imagem selecionada."})
 
     if image.size > MAX_FILE_SIZE:
-        return JsonResponse({"error": "Uploaded file excedes max size limit."})
+        return JsonResponse({"error": "Tamanho máximo excedido."})
 
     image_uuid = str(uuid.uuid4())
 
@@ -192,7 +192,7 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
         )
     ) != True:
         return JsonResponse(
-            {"error": f"An error occured while uploading the image: {status}"}
+            {"error": f"Erro ao dar upload da imagem: {status}"}
         )
 
     response = execute_workflow(
@@ -211,5 +211,5 @@ def facial_recognition_view(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"message": json.loads(json.loads(response.content)["message"])["Item"]["username"]["S"]})
 
     return JsonResponse(
-        {"error": f"An error occured while uploading the image: {json.loads(response.content)['error']}"}
+        {"error": f"Erro ao dar upload da imagem: {json.loads(response.content)['error']}"}
     )

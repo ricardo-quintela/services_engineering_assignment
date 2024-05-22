@@ -19,4 +19,4 @@ def payment_option(request: HttpRequest, option: int, telemovel: int) -> JsonRes
         valor: float = random.randint(5, 25)
         return JsonResponse({"valor": valor})
     else:
-        return JsonResponse({"error": "choose a valid option!"})
+        return JsonResponse({"error": "Escolha uma opção válida."})

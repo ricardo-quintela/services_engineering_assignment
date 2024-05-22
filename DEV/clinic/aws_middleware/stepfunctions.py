@@ -24,7 +24,7 @@ def execute_workflow(payload: dict, resource_arn: str) -> JsonResponse:
     try:
         json_input = json.dumps(payload)
     except TypeError:
-        return JsonResponse({"error": "Invalid payload."})
+        return JsonResponse({"error": "Parâmetros inválidos."})
 
     try:
         response = client.start_execution(
@@ -34,7 +34,7 @@ def execute_workflow(payload: dict, resource_arn: str) -> JsonResponse:
         execution_arn = response["executionArn"]
 
     except Exception as e:
-        return JsonResponse({"error": str(e)})
+        return JsonResponse({"error": "Erro ao conectar ao servidor."})
 
     for _ in range(MAX_RETRIES):
         try:
@@ -51,4 +51,4 @@ def execute_workflow(payload: dict, resource_arn: str) -> JsonResponse:
 
         time.sleep(1)
 
-    return JsonResponse({"error": "Step function execution timed out."})
+    return JsonResponse({"error": "Limite de tempo excedido."})

@@ -1,370 +1,376 @@
 {
-    "Comment": "Escolhe entre obter um faceprint ou fazer reconhecimento facial",
-    "StartAt": "Escolher Funcionalidade",
-    "States": {
-      "Escolher Funcionalidade": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "And": [
-              {
-                "Variable": "$.type",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.type",
-                "StringEquals": "facialRecognition"
-              }
-            ],
-            "Next": "Validação 1"
-          },
-          {
-            "And": [
-              {
-                "Variable": "$.type",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.type",
-                "StringEquals": "getFaceprint"
-              }
-            ],
-            "Next": "Validação 2"
-          }
-        ],
-        "Default": "VerificaCliente"
-      },
-      "Formato inválido": {
-        "Type": "Fail",
-        "Cause": "Input payload is in an invalid format."
-      },
-      "Validação 2": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "And": [
-              {
-                "Variable": "$.arguments.username",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.username",
-                "IsString": true
-              },
-              {
-                "Variable": "$.arguments.bucketName",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.bucketName",
-                "IsString": true
-              },
-              {
-                "Variable": "$.arguments.collectionId",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.collectionId",
-                "IsString": true
-              }
-            ],
-            "Next": "Obter Impressão Facial"
-          }
-        ],
-        "Default": "Formato inválido"
-      },
-      "Obter Impressão Facial": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "OutputPath": "$.Payload",
-        "Parameters": {
-          "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:getFacialPrint:$LATEST",
-          "Payload": {
-            "username.$": "$.arguments.username",
-            "bucketName.$": "$.arguments.bucketName",
-            "collectionId.$": "$.arguments.collectionId"
-          }
+  "Comment": "Escolhe entre obter um faceprint ou fazer reconhecimento facial",
+  "StartAt": "Escolher Funcionalidade",
+  "States": {
+    "Escolher Funcionalidade": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.type",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.type",
+              "StringEquals": "facialRecognition"
+            }
+          ],
+          "Next": "Validação 1"
         },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Verificação de erros 2"
+        {
+          "And": [
+            {
+              "Variable": "$.type",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.type",
+              "StringEquals": "getFaceprint"
+            }
+          ],
+          "Next": "Validação 2"
+        }
+      ],
+      "Default": "VerificaCliente"
+    },
+    "Formato inválido.": {
+      "Type": "Fail",
+      "Cause": "Coloque os parâmetros pedidos.",
+      "Error": "Parâmetros inválidos."
+    },
+    "Validação 2": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.arguments.username",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.username",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsString": true
+            }
+          ],
+          "Next": "Obter Impressão Facial"
+        }
+      ],
+      "Default": "Formato inválido."
+    },
+    "Obter Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:getFacialPrint:$LATEST",
+        "Payload": {
+          "username.$": "$.arguments.username",
+          "bucketName.$": "$.arguments.bucketName",
+          "collectionId.$": "$.arguments.collectionId"
+        }
       },
-      "Verificação de erros 2": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "And": [
-              {
-                "Variable": "$.faceId",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.username",
-                "IsPresent": true
-              }
-            ],
-            "Next": "Guardar Impressão Facial"
-          }
-        ],
-        "Default": "Formato inválido"
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Verificação de erros 2"
+    },
+    "Verificação de erros 2": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.faceId",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.username",
+              "IsPresent": true
+            }
+          ],
+          "Next": "Guardar Impressão Facial"
+        }
+      ],
+      "Default": "Formato inválido."
+    },
+    "Guardar Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "clinic.faces",
+        "Item": {
+          "faceId.$": "$.faceId",
+          "username.$": "$.username"
+        }
       },
-      "Guardar Impressão Facial": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::dynamodb:putItem",
-        "Parameters": {
-          "TableName": "clinic.faces",
-          "Item": {
-            "faceId.$": "$.faceId",
-            "username.$": "$.username"
-          }
+      "Next": "Success"
+    },
+    "Validação 1": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.arguments.imageUUID",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.imageUUID",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.bucketName",
+              "IsString": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.arguments.collectionId",
+              "IsString": true
+            }
+          ],
+          "Next": "Fazer Reconhecimento Facial"
+        }
+      ],
+      "Default": "Formato inválido."
+    },
+    "Fazer Reconhecimento Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload": {
+          "imageUUID.$": "$.arguments.imageUUID",
+          "bucketName.$": "$.arguments.bucketName",
+          "collectionId.$": "$.arguments.collectionId"
         },
-        "Next": "Success"
+        "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:clientFacialRecognition:$LATEST"
       },
-      "Validação 1": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "And": [
-              {
-                "Variable": "$.arguments.imageUUID",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.imageUUID",
-                "IsString": true
-              },
-              {
-                "Variable": "$.arguments.bucketName",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.bucketName",
-                "IsString": true
-              },
-              {
-                "Variable": "$.arguments.collectionId",
-                "IsPresent": true
-              },
-              {
-                "Variable": "$.arguments.collectionId",
-                "IsString": true
-              }
-            ],
-            "Next": "Fazer Reconhecimento Facial"
-          }
-        ],
-        "Default": "Formato inválido"
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "DeleteObject"
+    },
+    "DeleteObject": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket.$": "$.bucketName",
+        "Key.$": "$.imageUUID"
       },
-      "Fazer Reconhecimento Facial": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "OutputPath": "$.Payload",
-        "Parameters": {
-          "FunctionName": "arn:aws:lambda:us-east-1:730400266253:function:clientFacialRecognition:$LATEST",
-          "Payload": {
-            "imageUUID.$": "$.arguments.imageUUID",
-            "bucketName.$": "$.arguments.bucketName",
-            "collectionId.$": "$.arguments.collectionId"
-          }
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "DeleteObject"
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Next": "Verificação de erros 1",
+      "ResultPath": null
+    },
+    "Verificação de erros 1": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.faceId",
+          "IsPresent": true,
+          "Next": "Verificar Impressão Facial"
+        }
+      ],
+      "Default": "Formato inválido."
+    },
+    "Verificar Impressão Facial": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Parameters": {
+        "TableName": "clinic.faces",
+        "Key": {
+          "faceId.$": "$.faceId"
+        }
       },
-      "DeleteObject": {
-        "Type": "Task",
-        "Parameters": {
-          "Bucket.$": "$.bucketName",
-          "Key.$": "$.imageUUID"
-        },
-        "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
-        "Next": "Verificação de erros 1",
-        "ResultPath": null
+      "Next": "Verificação de correspondência"
+    },
+    "Verificação de correspondência": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Item",
+          "IsPresent": true,
+          "Next": "Success"
+        }
+      ],
+      "Default": "Não existe correspondência"
+    },
+    "Não existe correspondência": {
+      "Type": "Fail",
+      "Cause": "Nenhuma cara corresponde à enviada.",
+      "Error": "Sem correspondência."
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "VerificaCliente": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.cliente",
+          "IsPresent": true,
+          "Next": "VerificaData"
+        }
+      ],
+      "Default": "Fail (3)"
+    },
+    "Fail (3)": {
+      "Type": "Fail",
+      "Error": "Sem login efetuado.",
+      "Cause": "Não está logado."
+    },
+    "VerificaData": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.data",
+          "IsPresent": true,
+          "Next": "VerificaHora"
+        }
+      ],
+      "Default": "Fail (2)"
+    },
+    "VerificaHora": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.hora",
+          "NumericGreaterThan": 0,
+          "Next": "VerificaEspecialidade"
+        }
+      ],
+      "Default": "Fail (1)"
+    },
+    "VerificaEspecialidade": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.especialidade",
+          "NumericGreaterThan": 0,
+          "Next": "VerificaRepetição"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "VerificaRepetição": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:verificaRepeticao:$LATEST"
       },
-      "Verificação de erros 1": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.faceId",
-            "IsPresent": true,
-            "Next": "Verificar Impressão Facial"
-          }
-        ],
-        "Default": "Formato inválido"
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Repetição",
+      "ResultPath": "$.statusCode"
+    },
+    "Repetição": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.statusCode.Payload.statusCode",
+          "NumericEquals": 500,
+          "Next": "Fail (5)"
+        }
+      ],
+      "Default": "InsereConsulta",
+      "Comment": "$.Count"
+    },
+    "InsereConsulta": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:insereConsulta:$LATEST"
       },
-      "Verificar Impressão Facial": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::dynamodb:getItem",
-        "Parameters": {
-          "TableName": "clinic.faces",
-          "Key": {
-            "faceId.$": "$.faceId"
-          }
-        },
-        "Next": "Verificação de correspondência"
-      },
-      "Verificação de correspondência": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.Item",
-            "IsPresent": true,
-            "Next": "Success"
-          }
-        ],
-        "Default": "Não existe correspondência"
-      },
-      "Não existe correspondência": {
-        "Type": "Fail",
-        "Cause": "No match for face print."
-      },
-      "Success": {
-        "Type": "Succeed"
-      },
-      "VerificaCliente": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.cliente",
-            "IsPresent": true,
-            "Next": "VerificaData"
-          }
-        ],
-        "Default": "Fail (3)"
-      },
-      "Fail (3)": {
-        "Type": "Fail",
-        "Error": "You should be logged."
-      },
-      "VerificaData": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.data",
-            "IsPresent": true,
-            "Next": "VerificaHora"
-          }
-        ],
-        "Default": "Fail (2)"
-      },
-      "VerificaHora": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.hora",
-            "NumericGreaterThan": 0,
-            "Next": "VerificaEspecialidade"
-          }
-        ],
-        "Default": "Fail (1)"
-      },
-      "VerificaEspecialidade": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.especialidade",
-            "NumericGreaterThan": 0,
-            "Next": "VerificaRepetição"
-          }
-        ],
-        "Default": "Fail"
-      },
-      "VerificaRepetição": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Parameters": {
-          "Payload.$": "$",
-          "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:verificaRepeticao:$LATEST"
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Repetição",
-        "ResultPath": "$.statusCode"
-      },
-      "Repetição": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.statusCode.Payload.statusCode",
-            "NumericEquals": 500,
-            "Next": "Fail (5)"
-          }
-        ],
-        "Default": "InsereConsulta",
-        "Comment": "$.Count"
-      },
-      "InsereConsulta": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "OutputPath": "$.Payload",
-        "Parameters": {
-          "Payload.$": "$",
-          "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:insereConsulta:$LATEST"
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2
-          }
-        ],
-        "Next": "Success"
-      },
-      "Fail (5)": {
-        "Type": "Fail",
-        "Error": "Repetição de Consultas ou Médico Ocupado",
-        "Cause": "Mude Parâmetros"
-      },
-      "Fail": {
-        "Type": "Fail",
-        "Error": "Error in \"especialidade\""
-      },
-      "Fail (1)": {
-        "Type": "Fail",
-        "Error": "Miss in \"hora\""
-      },
-      "Fail (2)": {
-        "Type": "Fail",
-        "Error": "Miss in \"data\""
-      }
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Success"
+    },
+    "Fail (5)": {
+      "Type": "Fail",
+      "Error": "Repetição de Consultas ou Médico Ocupado.",
+      "Cause": "Mude Parâmetros."
+    },
+    "Fail": {
+      "Type": "Fail",
+      "Error": "Erro no parâmetro especialidade.",
+      "Cause": "Selecione uma especialidade."
+    },
+    "Fail (1)": {
+      "Type": "Fail",
+      "Error": "Erro na hora.",
+      "Cause": "Selecione uma hora válida."
+    },
+    "Fail (2)": {
+      "Type": "Fail",
+      "Error": "Erro na data.",
+      "Cause": "Selecione uma data válida."
     }
   }
+}

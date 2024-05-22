@@ -158,15 +158,14 @@ const AppointementsDashboard = ({
 									{data.user.username}
 									{data.estado !== "closed" && (
 										<Badge bg="primary" pill>
+										{
 											{
-                                                {
-                                                    open: "Aberta",
-                                                    ongoing: "A decorrer",
-                                                    payed: "Paga"
-                                                }[data.estado]
-
-                                            }
-										</Badge>
+												open: "Aberta",
+												ongoing: "A decorrer",
+												payed: "Paga",
+											}[data.estado]
+										}
+									</Badge>
 									)}
 								</div>
 								{data.data_appointment} - {" "}

@@ -73,12 +73,57 @@ const AdminDashboard = ({
             );
     };
 
+    const handleOnGoingAppointment = (appointmentId: number) => {
+        axios
+            .put(
+                process.env.REACT_APP_API_URL +
+                    `appointments/${appointmentId}/`,
+                { estado: "ongoing" }
+            )
+            .then((response) => {
+                if ("error" in response.data) {
+                    addNotification({
+                        title: "Erro",
+                        message: response.data["error"],
+                    });
+                    return;
+                }
+                setAppointmentData( [] as AppointmentData[] );
+                setRanQuery(false);
+                addNotification({
+                    title: "Success",
+                    message: "A clínica foi informada da sua entrada, aguarde pela chamada.",
+                });
+            })
+            .catch(() =>
+                addNotification({
+                    title: "Erro",
+                    message: "Ocorreu um erro ao procurar a sua consulta.",
+                })
+            );
+    };
+
     const handleFacialRecognitionResponse = (response: AxiosResponse) => {
         if ("message" in response.data) {
             addNotification({
                 title: "Sucesso",
                 message: `Cliente autenticado: ${response.data["message"]}`
             });
+
+            // TODO: search for an appointement in this date search_id/username
+            const url = process.env.REACT_APP_API_URL + `search_id/${response.data["message"]}`;
+            axios.get(
+                url
+            )
+            .then((response) => {
+                handleOnGoingAppointment(response.data["id"]);
+            })
+            .catch(() => {
+                addNotification({
+                    title: "Erro",
+                    message: "Ocorreu um erro ao procurar a consulta.",
+                })
+            })
             return;
         }
 

@@ -9,12 +9,12 @@ from DEV.clinic.clinic.settings import STATE_MACHINE_ARN
 ENTIDADE = 12345
 
 @api_view(["GET"])
-def payment_option(request: HttpRequest, option: int, telemovel: int) -> JsonResponse:
+def payment_option(request: HttpRequest, _id: int, option: int, telemovel: int) -> JsonResponse:
     
     response = execute_workflow(
         {
             "type": "requestIdempotencyKey",
-            "appointement_id": 2
+            "appointement_id": _id
         },
         STATE_MACHINE_ARN
     )

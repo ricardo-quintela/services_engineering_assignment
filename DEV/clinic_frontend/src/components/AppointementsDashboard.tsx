@@ -62,7 +62,7 @@ const AppointementsDashboard = ({
 	// Pedimos informações para ser possível proceder ao pagamento
 	const handlePayAppointment = (optionId: number) => {
 
-		const url = process.env.REACT_APP_API_URL + `payment/${optionId}/${numTele}`;
+		const url = process.env.REACT_APP_API_URL + `payment/${appointmentId}/${optionId}/${numTele}`;
 		console.log(url);
 
 		axios
@@ -75,6 +75,10 @@ const AppointementsDashboard = ({
 						title: "Error",
 						message: response.data["error"],
 					});
+					setInfoPayment(null);
+					setPaymentDocs(false);
+					setNumTele(0);
+					setRanQuery(false);
 					return;
 				}
 				

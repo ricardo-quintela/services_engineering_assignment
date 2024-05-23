@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-k*_)&cl25a#cq=k6wi+-igqe(fi&f+4lzh8=(e7_x#9cfh0t46"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # elasticbeanstalk
 EBS_HOST = os.environ.get(

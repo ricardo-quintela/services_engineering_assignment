@@ -18,11 +18,11 @@ function SchedullingForm() {
 
     const handleChangeSlide = (eventKey: number) => {
         if (eventKey === 0) {
-            setImagemAtual("NADA");
+            setImagemAtual("Sem preferência");
         } else if (eventKey === 1){
-            setImagemAtual("Homem");
+            setImagemAtual("Atanagildo da Silva Pereira");
         } else {
-            setImagemAtual("Mulher");
+            setImagemAtual("Joana Rodrigues Lopes");
         }
     };
 

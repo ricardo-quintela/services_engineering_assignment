@@ -1,0 +1,7 @@
+Criação da tabela:
+
+CREATE TABLE MEDICOS (
+	medico	VARCHAR(100),
+	data_appointment	VARCHAR(100),
+	hora	INTEGER
+);

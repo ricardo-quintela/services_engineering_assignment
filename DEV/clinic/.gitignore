@@ -1,0 +1,16 @@
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# env variables
+*variables.sh
+
+# Postgres
+.*pgpass
+
+# testes
+ronaldo.jpg
+test_json_image.json
+test_ws/

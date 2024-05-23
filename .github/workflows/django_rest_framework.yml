@@ -1,0 +1,49 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+env:
+  AWS_ACCESS_KEY_ID: ASIA2UDZ7TAGR2R4BJFW
+  AWS_SECRET_ACCESS_KEY: 3osvMUaeiqwTx4HyQhltdMPAiO3txH7z4PNkmzgP
+  AWS_DEFAULT_REGION: us-east-1
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.11]
+
+    services:
+      postgres:
+        image: postgres:16.3
+        env:
+          POSTGRES_DB: rds.clinic
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+          # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r DEV/clinic/requirements.txt
+    - name: Run Tests
+      run: |
+        python manage.py test --verbosity 2
+      working-directory: ./DEV/clinic

@@ -1,0 +1,132 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "VerificaCliente",
+    "States": {
+        "VerificaCliente": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.cliente",
+                "IsPresent": true,
+                "Next": "VerificaData"
+              }
+            ],
+            "Default": "Fail (3)"
+          },
+          "Fail (3)": {
+            "Type": "Fail",
+            "Error": "You should be logged."
+          },
+          "VerificaData": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.data",
+                "IsPresent": true,
+                "Next": "VerificaHora"
+              }
+            ],
+            "Default": "Fail (2)"
+          },
+          "VerificaHora": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.hora",
+                "NumericGreaterThan": 0,
+                "Next": "VerificaEspecialidade"
+              }
+            ],
+            "Default": "Fail (1)"
+          },
+          "VerificaEspecialidade": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.especialidade",
+                "NumericGreaterThan": 0,
+                "Next": "VerificaRepetição"
+              }
+            ],
+            "Default": "Fail"
+          },
+          "VerificaRepetição": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:verificaRepeticao:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 1,
+                "MaxAttempts": 3,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "Repetição",
+            "ResultPath": "$.statusCode"
+          },
+          "Repetição": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.statusCode.Payload.statusCode",
+                "NumericEquals": 500,
+                "Next": "Fail (5)"
+              }
+            ],
+            "Default": "InsereConsulta",
+            "Comment": "$.Count"
+          },
+          "InsereConsulta": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:us-east-1:497624740126:function:insereConsulta:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 1,
+                "MaxAttempts": 3,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "Success"
+          },
+          "Fail (5)": {
+            "Type": "Fail",
+            "Error": "Repetição de Consultas ou Médico Ocupado",
+            "Cause": "Mude Parâmetros"
+          },
+          "Success": {
+            "Type": "Succeed"
+          },
+          "Fail": {
+            "Type": "Fail",
+            "Error": "Error in \"especialidade\""
+          },
+          "Fail (1)": {
+            "Type": "Fail",
+            "Error": "Miss in \"hora\""
+          },
+          "Fail (2)": {
+            "Type": "Fail",
+            "Error": "Miss in \"data\""
+          }
+        }
+  }

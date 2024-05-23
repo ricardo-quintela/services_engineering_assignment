@@ -62,7 +62,7 @@ const AppointementsDashboard = ({
 	// Pedimos informações para ser possível proceder ao pagamento
 	const handlePayAppointment = (optionId: number) => {
 
-		const url = process.env.REACT_APP_API_URL + `payment/${appointmentId}/${optionId}/${numTele}`;
+		const url = process.env.REACT_APP_API_URL + `payment/${appointmentId}/${optionId}/${numTele}/`;
 		console.log(url);
 
 		axios
@@ -79,6 +79,7 @@ const AppointementsDashboard = ({
 					setPaymentDocs(false);
 					setNumTele(0);
 					setRanQuery(false);
+					setPaymentWindow(false);
 					return;
 				}
 				
@@ -93,7 +94,7 @@ const AppointementsDashboard = ({
 				setNumTele(0);
 				addNotification({
 					title: "Success",
-					message: "Please, procide with the payment.",
+					message: "Por favor, prossiga com o pagamento.",
 				})
 			})
 			.catch(() =>
@@ -235,7 +236,7 @@ const AppointementsDashboard = ({
 										setAskTele(false);
 										handlePayAppointment(1);
 										}}>
-										Proceguir
+										Prosseguir
 									</button>					
 								</div>
 							</div>	

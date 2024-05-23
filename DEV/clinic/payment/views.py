@@ -1,12 +1,27 @@
 import random
 from django.http import HttpRequest, JsonResponse
+import json
 
 from rest_framework.decorators import api_view
+
+from aws_middleware.stepfunctions import execute_workflow
+from clinic.settings import STATE_MACHINE_ARN
 
 ENTIDADE = 12345
 
 @api_view(["GET"])
-def payment_option(request: HttpRequest, option: int, telemovel: int) -> JsonResponse:
+def payment_option(request: HttpRequest, _id: int, option: int, telemovel: int) -> JsonResponse:
+    
+    response = execute_workflow(
+        {
+            "type": "requestIdempotencyKey",
+            "appointement_id": _id
+        },
+        STATE_MACHINE_ARN
+    )
+    
+    if "error" in json.loads(response.content):
+        return JsonResponse({"error": "Consulta já paga"})
     
     if option == 1:
         valor: float = random.randint(5, 25)

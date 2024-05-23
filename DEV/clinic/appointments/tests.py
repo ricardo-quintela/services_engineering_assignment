@@ -57,14 +57,6 @@ class TestAppointments(BaseTestCase):
             ],
         )
 
-    def test_get_appointments_not_admin(self):
-        """Tests if a regular user is blocked from accessing the appointments data"""
-        response = self.client.get(
-            "/appointments/", headers={"jwt": generate_token(self.users[0])}
-        )
-
-        self.assertJSONEqual(response.content, {"error": "Forbidden."})
-
     def test_close_appointment(self):
         """Tests if an admin can alter an appointment's field"""
         response = self.client.put(
@@ -96,7 +88,7 @@ class TestAppointments(BaseTestCase):
 
         self.assertJSONEqual(
             response.content,
-            {"error": "Consultas has no field named 'unexistent_attribute'"},
+            {"error": "Erro ao atualizar o estado da consulta."},
         )
 
     def test_close_appointment_not_admin(self):
@@ -151,4 +143,4 @@ class TestAppointments(BaseTestCase):
             data={"hora": 12, "especialidade": 2, "medico": "doctor"},
             headers={"jwt": generate_token(self.users[0])},
         )
-        self.assertJSONEqual(response.content, {"error": "Invalid payload."})
+        self.assertJSONEqual(response.content, {"error": "Parâmetros inválidos."})

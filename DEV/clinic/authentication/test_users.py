@@ -67,7 +67,7 @@ class TestUserEndPoints(BaseTestCase):
         )
 
         self.assertJSONEqual(
-            response.content, {"message": "Image successfully uploaded."}
+            response.content, {"message": "Imagem enviada com sucesso."}
         )
 
     def test_upload_file_not_authenticated(self):
@@ -87,7 +87,7 @@ class TestUserEndPoints(BaseTestCase):
             "/image/", headers={"jwt": generate_token(self.users[0])}
         )
 
-        self.assertJSONEqual(response.content, {"error": "No image was uploaded."})
+        self.assertJSONEqual(response.content, {"error": "Nenhuma imagem selecionada."})
 
     def test_upload_file_too_big(self):
         """Stops a request that doesn't contain a file"""
@@ -101,5 +101,5 @@ class TestUserEndPoints(BaseTestCase):
         )
 
         self.assertJSONEqual(
-            response.content, {"error": "Uploaded file excedes max size limit."}
+            response.content, {"error": "Tamanho máximo excedido."}
         )

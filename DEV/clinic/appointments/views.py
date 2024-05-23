@@ -1,23 +1,20 @@
 # pylint: disable=no-member
 from datetime import date
-from asgiref.sync import async_to_sync
 
 from django.http import HttpRequest, JsonResponse
 from django.core.exceptions import FieldDoesNotExist
 from django.contrib.auth.models import User
 
 from rest_framework.decorators import api_view
-from authentication.jwt import perm_required, validate_token, requires_jwt
+from authentication.jwt import validate_token, requires_jwt
 from aws_middleware.stepfunctions import execute_workflow
 from clinic.settings import STATE_MACHINE_ARN
-from clinic.consumers import ROOM_NAME, channel_layer
 
 
 from .models import Consultas
 from .serializers import AppointmentSerializer
 
 
-# @perm_required("admin")
 @api_view(["GET"])
 def all_appointments_view(_: HttpRequest) -> JsonResponse:
 
@@ -58,11 +55,6 @@ def update_appointments_view(request: HttpRequest, _id: int) -> JsonResponse:
 
     serializer = AppointmentSerializer(appointment.first())
 
-    # send message to ws channel
-    async_to_sync(channel_layer.group_send)(
-        ROOM_NAME, {"type": "chat.message", "message": serializer.data}
-    )
-
     return JsonResponse(serializer.data, safe=False)
 
 
@@ -100,18 +92,10 @@ def schedule_appointment(request: HttpRequest) -> JsonResponse:
             "estado": "open",
         }
 
-    response = execute_workflow(
+    return execute_workflow(
         appointment_data,
         STATE_MACHINE_ARN,
     )
-
-    if "message" in response:
-        # send message to ws channel
-        async_to_sync(channel_layer.group_send)(
-            ROOM_NAME, {"type": "chat.message", "message": appointment_data}
-        )
-
-    return response
 
 
 @api_view(["GET"])

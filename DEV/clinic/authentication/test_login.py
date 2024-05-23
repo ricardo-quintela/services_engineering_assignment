@@ -37,7 +37,7 @@ class TestLoginEndpoints(BaseTestCase):
         response = self.client.post(
             "/login/", data={"username": "unexistent_username", "password": "password"}
         )
-        self.assertJSONEqual(response.content, {"error": "Invalid username."})
+        self.assertJSONEqual(response.content, {"error": "Username inválido."})
 
     def test_login_invalid_password(self):
         """Tests if a user cannot login with an invalid password"""
@@ -45,7 +45,7 @@ class TestLoginEndpoints(BaseTestCase):
             "/login/",
             data={"username": "test_user1", "password": "unexistent_password"},
         )
-        self.assertJSONEqual(response.content, {"error": "Invalid password."})
+        self.assertJSONEqual(response.content, {"error": "Password inválida."})
 
     def test_register(self):
         """Tests if a new user can register on the website"""

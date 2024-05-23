@@ -98,14 +98,14 @@ function SchedullingForm() {
                         defaultValue="Escolha o que procura"
                     >
                         <option value="0"> Escolha o que procura </option>
-                        <option value="1">Mobilidade</option>
-                        <option value="2">Amputados</option>
-                        <option value="3">Massagens</option>
-                        <option value="3">Mais cenas e tal</option>
+                        <option value="1"> Massagem terapeutica </option>
+                        <option value="2"> Fisioterapia musculoesquelética </option>
+                        <option value="3"> Massagens </option>
+                        <option value="4"> Ondas de choque </option>
                     </select>
                 </div>
                 <div>
-                    <h5> Escolha o seu médico </h5>
+                    <h5> Escolha o seu fisioterapeuta </h5>
                     <Carousel
                         data-bs-theme="dark"
                         indicators={false}
@@ -130,7 +130,7 @@ function SchedullingForm() {
                         </Carousel.Item>
                         <Carousel.Item>
                             <div className="text-center">
-                                <span> Atanagildo </span>
+                                <span> Atanagildo da Silva Pereira </span>
                                 <img
                                     className="d-block mx-auto"
                                     src={atanagildoImagem}
@@ -144,7 +144,7 @@ function SchedullingForm() {
                         </Carousel.Item>
                         <Carousel.Item>
                             <div className="text-center">
-                                <span> Manuela </span>
+                                <span> Joana Rodrigues Lopes </span>
                                 <img
                                     className="d-block mx-auto"
                                     src={manuelaImagem}

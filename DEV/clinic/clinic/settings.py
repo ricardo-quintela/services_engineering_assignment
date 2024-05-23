@@ -35,6 +35,9 @@ S3_BUCKET_URL = os.environ.get("S3_BUCKET_URL", None)
 S3_STATIC_SITE_URL = os.environ.get(
     "S3_STATIC_SITE_URL", "http://localhost:3000"
 )  # "http://frontend.clinic.s3-website-us-east-1.amazonaws.com"
+CLINIC_MONITOR_STATIC_SITE = os.environ.get(
+    "CLINIC_MONITOR_STATIC_SITE", "http://localhost:3000"
+)
 S3_FRONTEND_BUCKET_NAME = os.environ.get("S3_FRONTEND_BUCKET_NAME", "frontend.clinic")
 S3_IMAGE_BUCKET_NAME = os.environ.get("S3_IMAGE_BUCKET_NAME", "image.clinic")
 
@@ -58,13 +61,14 @@ RDS_PASSWORD = os.environ.get("RDS_PASSWORD", "postgres")
 ALLOWED_HOSTS = [
     EBS_HOST,
     STEP_FUNCTION,
+    CLINIC_MONITOR_STATIC_SITE,
     "18.208.0.153",
     "127.0.0.1",
     "172.31.4.96",
-    "172.31.14.198"
+    "172.31.14.198",
 ]
 
-CORS_ALLOWED_ORIGINS = [S3_STATIC_SITE_URL]
+CORS_ALLOWED_ORIGINS = [S3_STATIC_SITE_URL, CLINIC_MONITOR_STATIC_SITE]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = ["jwt", "content-type"]
 CORS_EXPOSE_HEADERS = ["jwt"]
@@ -73,6 +77,7 @@ CORS_EXPOSE_HEADERS = ["jwt"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -83,7 +88,7 @@ INSTALLED_APPS = [
     "authentication",
     "clinic",
     "appointments",
-    "payment"
+    "payment",
 ]
 
 MIDDLEWARE = [
@@ -116,6 +121,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "clinic.wsgi.application"
+ASGI_APPLICATION = "clinic.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 
 # Database

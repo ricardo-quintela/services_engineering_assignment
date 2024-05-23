@@ -13,3 +13,11 @@ class Consultas(models.Model):
 
     class Meta:
         db_table = 'consultas'
+
+class Medicos(models.Model):
+    medico = models.CharField(max_length=100)
+    hora = models.IntegerField()
+    data_appointment = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'medicos'
